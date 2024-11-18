@@ -34,7 +34,7 @@ int main() {
     // insialisasi kegiatan
     int plhkgtn;
 
-    // alogritma memilih belanja
+    // alogritma memilih kegiatan
     printf("====================\n");
     printf("Selamat Datang Di E-commerce kami\n");
     printf("1.Belanja\n");
@@ -67,10 +67,39 @@ int main() {
 
         // algoritma memilih barang
         // inisialisasi
-        int plhbarang;
+        int plhbarang,jmlhbrg;
 
         printf("Pilih Barang yang akan dibeli = ");
         scanf("%d", &plhbarang);
+
+        if(plhbarang == 1){
+            printf("====================\n");
+            formatRibuan(barang[0].harga, hargaFormatted);
+            printf("Anda memilih = %s\n",barang[0].nama);
+            printf("Harga: Rp.%s\n", hargaFormatted);
+            printf("====================\n");
+            printf("Masukan jumlah barang yang akan dibeli = ");             
+            scanf("%d", &jmlhbrg);
+        }else if(plhbarang == 2){
+            printf("====================\n");
+            formatRibuan(barang[1].harga, hargaFormatted);
+            printf("Anda memilih = %s\n",barang[1].nama);
+            printf("Harga: Rp.%s\n", hargaFormatted);
+            printf("====================\n");
+            printf("Masukan jumlah barang yang akan dibeli = ");             
+            scanf("%d", &jmlhbrg);
+        }else if(plhbarang == 3){
+            printf("====================\n");
+            formatRibuan(barang[2].harga, hargaFormatted);
+            printf("Anda memilih = %s\n",barang[2].nama);
+            printf("Harga: Rp.%s\n", hargaFormatted);
+            printf("====================\n");
+            printf("Masukan jumlah barang yang akan dibeli = ");             
+            scanf("%d", &jmlhbrg);
+        }else {
+            printf("Maaf Input tidak diketahui!\n");
+        }
+
     } else if (plhkgtn == 2){
         
     }else{
