@@ -30,23 +30,51 @@ void formatRibuan(int angka, char *output) {
 }
 
 int main() {
-    // Inisialisasi barang
-    struct Barang barang[] = {
-        {"Keyboard", 500000},
-        {"Mouse", 200000},
-        {"Laptop", 10000000}
-    };
 
-    char hargaFormatted[20]; // Variabel untuk menyimpan hasil format harga
+    // insialisasi kegiatan
+    int plhkgtn;
 
-    // Menampilkan data barang
+    // alogritma memilih belanja
     printf("====================\n");
-    for (int i = 0; i < 3; i++) {
-        formatRibuan(barang[i].harga, hargaFormatted); // Format harga
-        printf("Barang %d\n", i + 1);
-        printf("Nama: %s\n", barang[i].nama);
-        printf("Harga: Rp.%s\n", hargaFormatted); // Cetak harga yang sudah diformat
+    printf("Selamat Datang Di E-commerce kami\n");
+    printf("1.Belanja\n");
+    printf("2.Lihat Keranjang\n");
+    printf("====================\n");
+    printf("Pilih = ");
+    scanf("%d", &plhkgtn);
+
+    if(plhkgtn == 1){
+        // algoritma menampilkan barang
+        // Inisialisasi barang
+        struct Barang barang[] = {
+            {"Keyboard", 500000},
+            {"Mouse", 200000},
+            {"Laptop", 10000000}
+        };
+        char hargaFormatted[20];
+
+        // Menampilkan data barang
         printf("====================\n");
+        printf("SELAMAT BERBELANJA!\n");
+        printf("====================\n");
+        for (int i = 0; i < 3; i++) {
+            formatRibuan(barang[i].harga, hargaFormatted);
+            printf("Barang %d\n", i + 1);
+            printf("Nama: %s\n", barang[i].nama);
+            printf("Harga: Rp.%s\n", hargaFormatted);
+            printf("====================\n");
+        }
+
+        // algoritma memilih barang
+        // inisialisasi
+        int plhbarang;
+
+        printf("Pilih Barang yang akan dibeli = ");
+        scanf("%d", &plhbarang);
+    } else if (plhkgtn == 2){
+        
+    }else{
+        printf("Maaf Input tidak diketahui!\n");
     }
 
     return 0;
