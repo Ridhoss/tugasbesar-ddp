@@ -5,22 +5,33 @@
 struct Akun {
     int id;
     char username[50];
-    char password[5];
-    int role;
+    char password[50];
+    int role; // 1: User, 2: Penjual
 };
 
 // Deklarasi global
 const char *users = "users.txt";
+
+//* Baca file akun
+int bacaFileAkun(struct Akun *akun) {
+    FILE *file = fopen(users, "r");
+    if (file == NULL) return 0;
+    int index = 0;
+    while (fscanf(file, "%d,%49[^,],%49[^,],%d\n", &akun[index].id, akun[index].username, akun[index].password, &akun[index].role) == 4) {
+        index++;
+    }
+    fclose(file);
+    return index;
+}
 
 //* Procedure daftar user
 void DaftarUser() {
     char username[50];
     char password[50];
     char password_check[50];
-    int cek = 0;
     int last_id = 0;
 
-    // cari id terakhir
+    // Cari id terakhir
     FILE *file = fopen(users, "r");
     if (file != NULL) {
         char line[200];
@@ -34,20 +45,20 @@ void DaftarUser() {
         fclose(file);
     }
 
-    for(;;){
+    for (;;) {
         printf("Masukan Username : ");
         scanf("%s", username);
         printf("=======================\n");
 
         int duplicate_check = 0;
 
-        // cari username
-        FILE *file = fopen(users, "r");
+        // Cari username
+        file = fopen(users, "r");
         if (file != NULL) {
             char line[200];
             while (fgets(line, sizeof(line), file)) {
                 char file_username[50];
-                sscanf(line, "%*d,%49[^,]", &file_username);
+                sscanf(line, "%*d,%49[^,]", file_username);
                 if (strcmp(username, file_username) == 0) {
                     duplicate_check = 1;
                     break;
@@ -56,10 +67,9 @@ void DaftarUser() {
             fclose(file);
         }
 
-        if (duplicate_check == 0)
-        {
+        if (duplicate_check == 0) {
             break;
-        }else {
+        } else {
             printf("Username Sudah Digunakan!\n");
             printf("=======================\n");
         }
@@ -80,7 +90,7 @@ void DaftarUser() {
             printf("Konfirmasi Password Salah!\n");
             printf("=======================\n");
         }
-}
+    }
 
     // Tambahkan data pengguna ke file
     file = fopen(users, "a");
@@ -89,10 +99,34 @@ void DaftarUser() {
         return;
     }
 
-    fprintf(file, "%d,%s,%s,%d\n", last_id + 1, username, password,1);
+    fprintf(file, "%d,%s,%s,%d\n", last_id + 1, username, password, 1);
     fclose(file);
 
-    printf("Registrasi berhasil!");
+    printf("Registrasi berhasil!\n");
+}
+
+//* Procedure login
+void Login(int *loggedIn, int *idLogin) {
+    char username[50];
+    char password[50];
+    struct Akun akun[100];
+    int total_akun = bacaFileAkun(akun);
+
+    printf("Masukan Username: ");
+    scanf("%s", username);
+    printf("Masukan Password: ");
+    scanf("%s", password);
+
+    for (int i = 0; i < total_akun; i++) {
+        if (strcmp(username, akun[i].username) == 0 && strcmp(password, akun[i].password) == 0) {
+            *loggedIn = 1;
+            *idLogin = akun[i].id;
+            printf("Login berhasil! Selamat datang, %s.\n", akun[i].username);
+            return;
+        }
+    }
+
+    printf("Username atau Password salah!\n");
 }
 
 //* Procedure daftar
@@ -102,15 +136,13 @@ void Daftar() {
     printf("=======================\n");
     printf("=== Daftar ===\n");
     printf("=======================\n");
-    printf("1. Buat Akun\n");
+    printf("1. Buat Akun User\n");
     printf("2. Buat Akun Penjual\n");
     printf("Pilih : ");
     scanf("%d", &pilihan);
 
     if (pilihan == 1) {
         DaftarUser();
-    } else if (pilihan == 2) {
-        printf("Fitur untuk penjual belum tersedia.\n");
     } else {
         printf("Error 404. Input Tidak Diketahui\n");
     }
@@ -127,17 +159,14 @@ void Masuk(int *loggedIn, int *idLogin) {
     scanf("%d", &masuk);
 
     if (masuk == 1) {
-        //! Procedure login
-        printf("Fitur login belum tersedia.\n");
+        Login(loggedIn, idLogin);
     } else if (masuk == 2) {
         Daftar();
+        Login(loggedIn, idLogin);
     } else {
         printf("Error 404. Input Tidak Diketahui\n");
     }
 }
-
-//* procedure login 
-
 
 //* Main Program
 int main() {
@@ -149,58 +178,11 @@ int main() {
 
     Masuk(&loggedIn, &idLogin);
 
+    if (loggedIn) {
+        printf("Anda sudah login dengan ID: %d\n", idLogin);
+    } else {
+        printf("Terima kasih telah menggunakan program ini.\n");
+    }
+
     return 0;
 }
-
-
-
-
-
-//* Function aksi login
-// int aksiLogin(char inputNama[50], char inputPassword[5]) {
-//     for (int i = 0; i < sizeof(akun) / sizeof(akun[0]); i++) {
-//         if (strcmp(inputNama, akun[i].nama) == 0 && strcmp(inputPassword, akun[i].password) == 0) {
-//             printf("Login berhasil!\n");
-
-//             if (akun[i].role == 0) {
-//                 printf("Selamat datang, Admin!\n");
-//                 return 2;
-//             } else if (akun[i].role == 1) {
-//                 printf("Selamat datang, %s!\n", akun[i].nama);
-//                 return 1;
-//             }
-//         }
-//     }
-// }
-
-//* Fungsi utama
-// int main() {
-//     char inputNama[50];
-//     char inputPassword[5];
-//     int loggedIn = 0;
-
-//     printf("=== Selamat Datang ===\n");
-//     // input login
-//     printf("Masukkan nama: ");
-//     scanf("%s", inputNama);
-//     printf("Masukkan password: ");
-//     scanf("%s", inputPassword);
-//     printf("=======================\n");
-
-//     // login
-//     loggedIn = aksiLogin(inputNama, inputPassword);
-
-//     if (loggedIn == 2) {
-//         // untuk admin
-//         printf("admin.\n");
-//     }else if(loggedIn == 1){
-//         // untuk user
-//         printf("User.\n");
-//     }else {
-//         // gagal login
-//         printf("Login gagal! Nama atau password salah.\n");
-//     }
-
-//     return 0;
-// }
-
