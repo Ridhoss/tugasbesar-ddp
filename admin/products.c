@@ -3,6 +3,9 @@
 #include <string.h>
 #include "product.h"
 
+// Deklarasi global
+const char *file_products = "database/inventory.txt";
+
 void addProduct(Product *products, int *count, int max_count) {
     if (*count >= max_count) {
         printf("Tidak bisa menambahkan produk lagi\n");
@@ -36,7 +39,7 @@ void listProducts(Product *products, int count) {
 }
 
 void saveProducts(Product *products, int count) {
-    FILE *file = fopen("inventory.txt", "w");
+    FILE *file = fopen(file_products, "w");
     if (!file) {
         printf("Error\n");
         return;
@@ -51,7 +54,7 @@ void saveProducts(Product *products, int count) {
 }
 
 int loadProducts(Product *products, int max_count) {
-    FILE *file = fopen("inventory.txt", "r");
+    FILE *file = fopen(file_products, "r");
     if (!file) {
         printf("Tidak ada data.\n");
         return 0;
