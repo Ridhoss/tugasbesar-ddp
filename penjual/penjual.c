@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "product.h"
+#include "penjual.h"
 
 // Deklarasi global
-const char *file_products = "database/inventory.txt";
+const char *file_products = "database/product.txt";
 
 void addProduct(Product *products, int *count, int max_count) {
     if (*count >= max_count) {

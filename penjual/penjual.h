@@ -1,5 +1,5 @@
-#ifndef PRODUCT_H
-#define PRODUCT_H
+#ifndef PENJUAL_H
+#define PENJUAL_H
 
 typedef struct {
     int id;
