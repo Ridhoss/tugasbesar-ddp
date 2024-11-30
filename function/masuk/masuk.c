@@ -12,10 +12,11 @@ int BacaFileAkun(struct Akun *akun) {
     if (file == NULL) return 0;
 
     int index = 0;
-    while (fscanf(file, "%d,%49[^,],%49[^,],%d,%49[^\n]\n", 
-                  &akun[index].id, akun[index].username, 
-                  akun[index].password, &akun[index].role, 
-                  akun[index].store_name) == 5) {
+    while (fscanf(file, "%d,%49[^,],%49[^,],%49[^,],%49[^,],%d,%49[^\n]\n", 
+                &akun[index].id, akun[index].username, 
+                akun[index].password, akun[index].phone, 
+                akun[index].alamat, &akun[index].role, 
+                akun[index].store_name) == 7) {
 
         // Jika store_name kosong dan role 1, set default string "null"
         if (akun[index].role == 1 && akun[index].store_name[0] == '\0') {
@@ -33,6 +34,8 @@ void DaftarAkun(int role) {
     char username[50];
     char password[50];
     char password_check[50];
+    char phone[14];
+    char alamat[50];
     char store_name[50] = "null";
     int last_id = 0;
 
@@ -97,6 +100,13 @@ void DaftarAkun(int role) {
         }
     }
 
+    printf("=======================\n");
+    printf("Masukan Nomor Telepon : ");
+    scanf("%s", phone);
+    printf("Masukan Alamat : ");
+    scanf("%s", alamat);
+    printf("=======================\n");
+
     if (role == 2) {
         printf("Masukkan Nama Toko: ");
         getchar();
@@ -114,12 +124,12 @@ void DaftarAkun(int role) {
 
     if (role == 1){
         // Jika role adalah user biasa, simpan store_name sebagai "null"
-        fprintf(file, "%d,%s,%s,%d,%s\n", last_id + 1, username, password, 1, store_name); 
+        fprintf(file, "%d,%s,%s,%s,%s,%d,%s\n", last_id + 1, username, password, phone, alamat, 1, store_name); 
     }else if(role == 2) {
        // Jika role adalah penjual, simpan store_name sesuai input
-        fprintf(file, "%d,%s,%s,%d,%s\n", last_id + 1, username, password, 2, store_name); 
+        fprintf(file, "%d,%s,%s,%s,%s,%d,%s\n", last_id + 1, username, password, phone, alamat, 2, store_name); 
     }else {
-        fprintf(file, "%d,%s,%s,%d\n", last_id + 1, username, password, 3, store_name);
+        fprintf(file, "%d,%s,%s,%s,%s,%d,%s\n", last_id + 1, username, password, phone, alamat, 3, store_name);
     }
     fclose(file);
 
@@ -215,7 +225,7 @@ void Masuk(int *loggedIn, int *idLogin) {
 }
 
 // Procedure CariAkun
-void CariAkun(int idLogin, char *username, char *password, int *role, char *store_name) {
+void CariAkun(int idLogin, char *username, char *password, char *phone, char *alamat, int *role, char *store_name) {
     struct Akun akun[100];
     int totalAkun;
 
@@ -225,6 +235,8 @@ void CariAkun(int idLogin, char *username, char *password, int *role, char *stor
             *role = akun[i].role;
             strcpy(username, akun[i].username);
             strcpy(password, akun[i].password);
+            strcpy(phone, akun[i].phone);
+            strcpy(alamat, akun[i].alamat);
             if (*role == 2) {
                 strcpy(store_name, akun[i].store_name); // Ambil store_name jika penjual
             }
@@ -238,10 +250,12 @@ void Logout(int *con){
     *con = 0;
 }
 
-void Clear(int *idLogin, char *username, char *password, int *role, char *store_name){
+void Clear(int *idLogin, char *username, char *password, char *phone, char *alamat, int *role, char *store_name){
     strcpy(username,"");
     strcpy(password,"");
     strcpy(store_name,"");
+    strcpy(phone,"");
+    strcpy(alamat,"");
     *role = 0;
     *idLogin = 0;
 }

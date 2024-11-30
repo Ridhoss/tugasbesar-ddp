@@ -11,7 +11,7 @@ typedef struct {
 } Product;
 
 // ke halaman admin
-void halamanAdmin(int *loggedIn, int idLogin, char username[50], char password[50], int role, char store_name[50]);
+void halamanAdmin(int *loggedIn, int idLogin, char username[50], char password[50], char *phone, char *alamat, int role, char store_name[50]);
 
 // Menambahkan produk baru ke dalam daftar produk
 void addProduct(Product *products, int *count, int max_count, const char *store_name);

@@ -17,13 +17,13 @@ int main() {
 
         if (loggedIn == 1) {
             // mencari akun berdasarkan id yang login
-            CariAkun(idLogin, username, password, &role, store_name);
+            CariAkun(idLogin, username, password, phone, alamat, &role, store_name);
             if (role == 2)
             {
-                halamanAdmin(&loggedIn, idLogin, username, password, role, store_name);
+                halamanAdmin(&loggedIn, idLogin, username, password, phone, alamat, role, store_name);
             }
         } else if(loggedIn == 2){
-            Clear(&idLogin, username, password, &role, store_name);
+            Clear(&idLogin, username, password, password, phone, &role, store_name);
             printf("Terima kasih telah menggunakan program ini.\n");
             break;
         } 
@@ -33,6 +33,8 @@ int main() {
     printf("Username = %s\n", username);
     printf("Password = %s\n", password);
     printf("Store = %s\n", store_name);
+    printf("Password = %s\n", phone);
+    printf("Store = %s\n", alamat);
     printf("Role = %d\n", role);
     printf("=======================\n");
 

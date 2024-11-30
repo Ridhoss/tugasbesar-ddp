@@ -7,7 +7,7 @@
 // Deklarasi global
 const char *file_products = "database/product.txt";
 
-void halamanAdmin(int *loggedIn, int idLogin, char username[50], char password[50], int role, char store_name[50]){
+void halamanAdmin(int *loggedIn, int idLogin, char username[50], char password[50], char *phone, char *alamat, int role, char store_name[50]){
 
     int conlog;
     conlog = *loggedIn;
