@@ -103,17 +103,18 @@ void DaftarAkun(int role) {
     printf("=======================\n");
     printf("Masukan Nomor Telepon : ");
     scanf("%s", phone);
-    printf("Masukan Alamat : ");
-    scanf("%s", alamat);
-    printf("=======================\n");
+    // Membaca alamat
+printf("Masukan Alamat: ");
+getchar(); // Hilangkan karakter newline yang tertinggal di buffer
+fgets(alamat, sizeof(alamat), stdin);
+alamat[strcspn(alamat, "\n")] = '\0'; // Hapus newline jika ada
 
-    if (role == 2) {
-        printf("Masukkan Nama Toko: ");
-        getchar();
-        fgets(store_name, sizeof(store_name), stdin);
-        // Hapus newline yang ada di akhir store_name jika ada
-        store_name[strcspn(store_name, "\n")] = 0;
-    }
+// Membaca nama toko (jika role == 2)
+if (role == 2) {
+    printf("Masukkan Nama Toko: ");
+    fgets(store_name, sizeof(store_name), stdin);
+    store_name[strcspn(store_name, "\n")] = '\0'; // Hapus newline
+}
 
     // Tambahkan data pengguna ke file
     file = fopen(users, "a");

@@ -1,1 +1,2 @@
 1,bala bala,makanan,20000.00,5,sachinstore
+2,Laptop,Elektronik,10000000.00,1,Raihana Store
