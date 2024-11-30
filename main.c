@@ -9,6 +9,8 @@ int main() {
     char username[50];
     char password[50];
     char store_name[50];
+    char phone[14];
+    char alamat[50];
 
     for (;;) {
         Masuk(&loggedIn, &idLogin);

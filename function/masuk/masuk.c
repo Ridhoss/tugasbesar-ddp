@@ -127,7 +127,7 @@ void DaftarAkun(int role) {
 }
 
 //* Procedure login
-void Login(int *loggedIn, int *idLogin, char *store_name) {
+void Login(int *loggedIn, int *idLogin) {
     char username[50];
     char password[50];
     struct Akun akun[100];
@@ -147,11 +147,6 @@ void Login(int *loggedIn, int *idLogin, char *store_name) {
             if (strcmp(username, akun[i].username) == 0 && strcmp(password, akun[i].password) == 0) {
                 *loggedIn = 1;
                 *idLogin = akun[i].id;
-
-                if (akun[i].role == 2) {
-                    strcpy(store_name, akun[i].store_name);
-                }
-
                 return;
             }
         }
@@ -189,7 +184,6 @@ void Daftar() {
 //* Procedure masuk
 void Masuk(int *loggedIn, int *idLogin) {
     int masuk = 0;
-    char store_name[50];
 
     printf("===========================\n");
     printf("=== Selamat Datang Di E-Commerce ===\n");
@@ -205,11 +199,11 @@ void Masuk(int *loggedIn, int *idLogin) {
         scanf("%d", &masuk);
 
         if (masuk == 1) {
-            Login(loggedIn, idLogin, store_name);
+            Login(loggedIn, idLogin);
             break;
         } else if (masuk == 2) {
             Daftar();
-            Login(loggedIn, idLogin, store_name);
+            Login(loggedIn, idLogin);
             break;
         } else if (masuk == 3) {   
             *loggedIn = 2;

@@ -15,7 +15,7 @@ int BacaFileAkun(struct Akun *akun);
 //* Procedure daftar user
 void DaftarAkun(int role);
 //* Procedure login
-void Login(int *loggedIn, int *idLogin, char *store_name);
+void Login(int *loggedIn, int *idLogin);
 //* Procedure daftar
 void Daftar();
 //* Procedure masuk
