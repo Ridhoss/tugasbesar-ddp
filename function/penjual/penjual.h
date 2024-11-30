@@ -9,6 +9,7 @@ typedef struct {
     int stock;
 } Product;
 
+void halamanAdmin(int *loggedIn, int idLogin, char username[50], char password[50], int role);
 void addProduct(Product *products, int *count, int max_count);
 void listProducts(Product *products, int count);
 void saveProducts(Product *products, int count);

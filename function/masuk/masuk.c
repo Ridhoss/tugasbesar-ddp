@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "login.h"
+#include "masuk.h"
 
 // Deklarasi global
 const char *users = "database/users.txt";
@@ -96,8 +96,10 @@ void DaftarAkun(int role) {
     if (role == 1)
     {
         fprintf(file, "%d,%s,%s,%d\n", last_id + 1, username, password, 1);
-    }else {
+    }else if(role == 2) {
         fprintf(file, "%d,%s,%s,%d\n", last_id + 1, username, password, 2);
+    }else {
+        fprintf(file, "%d,%s,%s,%d\n", last_id + 1, username, password, 3);
     }
     fclose(file);
 
@@ -144,6 +146,7 @@ void Daftar() {
     printf("=======================\n");
     printf("1. Buat Akun User\n");
     printf("2. Buat Akun Penjual\n");
+    printf("3. Buat Akun Kurir\n");
     printf("Pilih : ");
     scanf("%d", &pilihan);
 
@@ -151,7 +154,9 @@ void Daftar() {
         DaftarAkun(1);
     }else if(pilihan == 2){
         DaftarAkun(2);
-    } else {
+    }else if(pilihan == 3) {
+        DaftarAkun(3);
+    }else {
         printf("Error 404. Input Tidak Diketahui\n");
     }
 }
@@ -160,9 +165,14 @@ void Daftar() {
 void Masuk(int *loggedIn, int *idLogin) {
     int masuk;
 
+    printf("===========================\n");
+    printf("=== Selamat Datang Di E-Commerce ===\n");
+    printf("===========================\n");
+
     printf("Apakah Sudah Memiliki Akun?\n");
     printf("1. Masuk\n");
     printf("2. Daftar\n");
+    printf("3. Keluar Dari Aplikasi\n");
     printf("Pilih : ");
     scanf("%d", &masuk);
 
@@ -171,13 +181,16 @@ void Masuk(int *loggedIn, int *idLogin) {
     } else if (masuk == 2) {
         Daftar();
         Login(loggedIn, idLogin);
+    } else if (masuk == 3)
+    {   
+        *loggedIn = 2;
     } else {
         printf("Error 404. Input Tidak Diketahui\n");
     }
 }
 
 // Procedure CariAkun
-void CariAkun(char *username, char *password, int *role, int idLogin) {
+void CariAkun(int idLogin, char *username, char *password, int *role) {
     struct Akun akun[100];
     int totalAkun;
 
@@ -190,4 +203,9 @@ void CariAkun(char *username, char *password, int *role, int idLogin) {
             break;
         }
     }
+}
+
+// procedure Logout
+void Logout(int *con){
+    *con = 0;
 }

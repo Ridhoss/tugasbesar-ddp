@@ -2,9 +2,61 @@
 #include <stdlib.h>
 #include <string.h>
 #include "penjual.h"
+#include "../masuk/masuk.h"
 
 // Deklarasi global
 const char *file_products = "database/product.txt";
+
+void halamanAdmin(int *loggedIn, int idLogin, char username[50], char password[50], int role){
+
+    int conlog;
+    conlog = *loggedIn;
+
+    printf("===========================\n");
+    printf("=== Selamat Datang %s ===\n",username);
+    printf("===========================\n");
+
+    const int MAX_PRODUCTS = 100;
+    Product products[MAX_PRODUCTS];
+    int count = 0;
+
+    count = loadProducts(products, MAX_PRODUCTS);
+
+    int choice;
+    do {
+        printf("\n--- Admin ---\n");
+        printf("1. Tambah Produk\n");
+        printf("2. List Produk\n");
+        printf("3. Simpan Produk\n");
+        printf("4. Edit Produk\n");
+        printf("5. Hapus Produk\n");
+        printf("6. Logout\n");
+        printf("Masukan pilihan: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1:
+                addProduct(products, &count, MAX_PRODUCTS);
+                break;
+            case 2:
+                listProducts(products, count);
+                break;
+            case 3:
+                saveProducts(products, count);
+                break;
+            case 4:
+                editProduct(products, count);
+                break;
+            case 5:
+                deleteProduct(products, &count);
+                break;
+            case 6:
+                Logout(&conlog);
+                break;
+            default:
+                printf("Pilihan tidak ada\n");
+        }
+    } while (choice != 6);
+}
 
 void addProduct(Product *products, int *count, int max_count) {
     if (*count >= max_count) {
@@ -34,7 +86,7 @@ void listProducts(Product *products, int count) {
     printf("\n--- Daftar Produk ---\n");
     for (int i = 0; i < count; i++) {
         printf("ID: %d, Nama: %s, Kategori: %s, Harga: %.2f, Stok: %d\n",
-               products[i].id, products[i].name, products[i].category, products[i].price, products[i].stock);
+            products[i].id, products[i].name, products[i].category, products[i].price, products[i].stock);
     }
 }
 
@@ -64,9 +116,9 @@ int loadProducts(Product *products, int max_count) {
     printf("Memuat produk...\n");
 
     while (fscanf(file, "%d,%49[^,],%29[^,],%f,%d\n",
-                  &products[count].id, products[count].name,
-                  products[count].category, &products[count].price,
-                  &products[count].stock) == 5) {
+                &products[count].id, products[count].name,
+                products[count].category, &products[count].price,
+                &products[count].stock) == 5) {
         count++;
         if (count >= max_count) break;
     }

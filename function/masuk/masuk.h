@@ -1,5 +1,5 @@
-#ifndef LOGIN_H
-#define LOGIN_H
+#ifndef MASUK_H
+#define MASUK_H
 
 // Record akun
 struct Akun {
@@ -20,6 +20,8 @@ void Daftar();
 //* Procedure masuk
 void Masuk(int *loggedIn, int *idLogin);
 //* Procedure CariAkun
-void CariAkun(char *username, char *password, int *role, int idLogin);
+void CariAkun(int idLogin, char *username, char *password, int *role);
+//* procedure logout
+void Logout(int *con);
 
 #endif
