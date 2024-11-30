@@ -25,6 +25,6 @@ void CariAkun(int idLogin, char *username, char *password, int *role, char *stor
 //* procedure logout
 void Logout(int *con);
 //* Clear Account
-void Clear(int *idLogin, char *username, char *password, int *role);
+void Clear(int *idLogin, char *username, char *password, int *role, char *store_name);
 
 #endif

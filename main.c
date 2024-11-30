@@ -21,7 +21,7 @@ int main() {
                 halamanAdmin(&loggedIn, idLogin, username, password, role, store_name);
             }
         } else if(loggedIn == 2){
-            Clear(&idLogin, username, password, &role);
+            Clear(&idLogin, username, password, &role, store_name);
             printf("Terima kasih telah menggunakan program ini.\n");
             break;
         } 
@@ -30,6 +30,7 @@ int main() {
     // untuk cek
     printf("Username = %s\n", username);
     printf("Password = %s\n", password);
+    printf("Store = %s\n", store_name);
     printf("Role = %d\n", role);
     printf("=======================\n");
 

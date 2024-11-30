@@ -244,9 +244,10 @@ void Logout(int *con){
     *con = 0;
 }
 
-void Clear(int *idLogin, char *username, char *password, int *role){
+void Clear(int *idLogin, char *username, char *password, int *role, char *store_name){
     strcpy(username,"");
     strcpy(password,"");
+    strcpy(store_name,"");
     *role = 0;
     *idLogin = 0;
 }

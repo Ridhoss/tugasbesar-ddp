@@ -166,8 +166,8 @@ void viewProduct(Product *products, int count, const char *store_name) {
     for (int i = 0; i < count; i++) {
         if (strcmp(products[i].store_name, store_name) == 0) {
             printf("ID: %d, Nama: %s, Kategori: %s, Harga: %.2f, Stok: %d\n",
-                   products[i].id, products[i].name, products[i].category,
-                   products[i].price, products[i].stock);
+                products[i].id, products[i].name, products[i].category,
+                products[i].price, products[i].stock);
             found = 1;
         }
     }
