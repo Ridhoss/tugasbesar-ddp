@@ -7,13 +7,13 @@
 // Deklarasi global
 const char *file_products = "database/product.txt";
 
-void halamanAdmin(int *loggedIn, int idLogin, char username[50], char password[50], int role){
+void halamanAdmin(int *loggedIn, int idLogin, char username[50], char password[50], int role, char store_name[50]){
 
     int conlog;
     conlog = *loggedIn;
 
     printf("===========================\n");
-    printf("=== Selamat Datang %s ===\n",username);
+    printf("=== Selamat Datang %s ===\n", store_name);
     printf("===========================\n");
 
     const int MAX_PRODUCTS = 100;
@@ -35,22 +35,22 @@ void halamanAdmin(int *loggedIn, int idLogin, char username[50], char password[5
         scanf("%d", &choice);
         switch (choice) {
             case 1:
-                addProduct(products, &count, MAX_PRODUCTS);
+                addProduct(products, &count, MAX_PRODUCTS, store_name);
                 break;
             case 2:
-                listProducts(products, count);
+                viewProduct(products, count, store_name);
                 break;
             case 3:
                 saveProducts(products, count);
                 break;
             case 4:
-                editProduct(products, count);
+                editProduct(products, count, store_name);
                 break;
             case 5:
-                deleteProduct(products, &count);
+                deleteProduct(products, &count,MAX_PRODUCTS ,store_name);
                 break;
             case 6:
-                Logout(&conlog);
+                printf("Keluar...\n");
                 break;
             default:
                 printf("Pilihan tidak ada\n");
@@ -58,25 +58,42 @@ void halamanAdmin(int *loggedIn, int idLogin, char username[50], char password[5
     } while (choice != 6);
 }
 
-void addProduct(Product *products, int *count, int max_count) {
+void addProduct(Product *products, int *count, int max_count, const char *store_name) {
     if (*count >= max_count) {
-        printf("Tidak bisa menambahkan produk lagi\n");
+        printf("Kapasitas maksimal produk tercapai.\n");
         return;
     }
-    Product *p = &products[*count];
-    printf("Masukan ID Produk:  ");
-    scanf("%d", &p->id);
-    printf("Masukan Nama Produk: ");
-    scanf("%s", p->name);
-    printf("Masukan Kategori: ");
-    scanf("%s", p->category);
-    printf("Masukan Harga: ");
-    scanf("%f", &p->price);
-    printf("Masukan Stok: ");
-    scanf("%d", &p->stock);
+
+    // Cari ID terbesar di dalam produk yang ada
+    int max_id = 0;
+    for (int i = 0; i < *count; i++) {
+        if (products[i].id > max_id) {
+            max_id = products[i].id;
+        }
+    }
+
+    // Agar ID Increment
+    Product newProduct;
+    newProduct.id = max_id + 1;
+
+    // Input data produk baru
+    printf("Masukkan nama produk: ");
+    scanf(" %[^\n]", newProduct.name);
+    printf("Masukkan kategori produk: ");
+    scanf(" %[^\n]", newProduct.category);
+    printf("Masukkan harga produk: ");
+    scanf("%f", &newProduct.price);
+    printf("Masukkan stok produk: ");
+    scanf("%d", &newProduct.stock);
+    strcpy(newProduct.store_name, store_name);
+
+    // Tambahkan produk baru ke array
+    products[*count] = newProduct;
     (*count)++;
-    printf("Produk berhasil ditambah\n");
+
+    printf("Produk berhasil ditambahkan dengan ID: %d\n", newProduct.id);
 }
+
 
 void listProducts(Product *products, int count) {
     if (count == 0) {
@@ -93,16 +110,18 @@ void listProducts(Product *products, int count) {
 void saveProducts(Product *products, int count) {
     FILE *file = fopen(file_products, "w");
     if (!file) {
-        printf("Error\n");
+        printf("Gagal membuka file untuk menyimpan data.\n");
         return;
     }
+
     for (int i = 0; i < count; i++) {
-        fprintf(file, "%d,%s,%s,%.2f,%d\n",
-                products[i].id, products[i].name, products[i].category,
-                products[i].price, products[i].stock);
+        fprintf(file, "%d,%s,%s,%.2f,%d,%s\n", 
+                products[i].id, products[i].name, products[i].category, 
+                products[i].price, products[i].stock, products[i].store_name);
     }
+
     fclose(file);
-    printf("Produk berhasil disimpan\n");
+    printf("Produk berhasil disimpan.\n");
 }
 
 int loadProducts(Product *products, int max_count) {
@@ -115,79 +134,108 @@ int loadProducts(Product *products, int max_count) {
     int count = 0;
     printf("Memuat produk...\n");
 
-    while (fscanf(file, "%d,%49[^,],%29[^,],%f,%d\n",
-                &products[count].id, products[count].name,
-                products[count].category, &products[count].price,
-                &products[count].stock) == 5) {
-        count++;
+    while (fscanf(file, "%d,%49[^,],%29[^,],%f,%d,%49[^\n]\n",
+                  &products[count].id, products[count].name,
+                  products[count].category, &products[count].price,
+                  &products[count].stock, products[count].store_name) == 6) {
+        // Cek duplikasi ID
+        int isDuplicate = 0;
+        for (int i = 0; i < count; i++) {
+            if (products[i].id == products[count].id) {
+                isDuplicate = 1;
+                break;
+            }
+        }
+        if (!isDuplicate) {
+            count++;
+        }
         if (count >= max_count) break;
     }
-    
-    fclose(file);
 
+    fclose(file);
     printf("Memuat %d produk dari file.\n", count);
     return count;
 }
 
 
-void editProduct(Product *products, int count) {
-    if (count == 0) {
-        printf("Tidak ada produk untuk diedit.\n");
-        return;
-    }
-
-    int id, found = 0;
-    printf("\n--- Edit Produk ---\n");
-    printf("Masukkan ID Produk yang ingin diedit: ");
-    scanf("%d", &id);
-
+// Untuk menampilkan produk milik toko tertentu
+void viewProduct(Product *products, int count, const char *store_name) {
+    int found = 0;
+        printf("\n--- Daftar Produk ---\n");
+    printf("Produk yang dimiliki oleh toko %s:\n", store_name);
     for (int i = 0; i < count; i++) {
-        if (products[i].id == id) {
+        if (strcmp(products[i].store_name, store_name) == 0) {
+            printf("ID: %d, Nama: %s, Kategori: %s, Harga: %.2f, Stok: %d\n",
+                   products[i].id, products[i].name, products[i].category,
+                   products[i].price, products[i].stock);
             found = 1;
-            printf("\nMengedit Produk ID: %d\n", id);
-            printf("Nama saat ini: %s\nMasukkan Nama Baru: ", products[i].name);
-            scanf("%s", products[i].name);
-            printf("Kategori saat ini: %s\nMasukkan Kategori Baru: ", products[i].category);
-            scanf("%s", products[i].category);
-            printf("Harga saat ini: %.2f\nMasukkan Harga Baru: ", products[i].price);
-            scanf("%f", &products[i].price);
-            printf("Stok saat ini: %d\nMasukkan Stok Baru: ", products[i].stock);
-            scanf("%d", &products[i].stock);
-            printf("Produk berhasil diperbarui!\n");
-            return;
         }
     }
 
     if (!found) {
-        printf("Produk dengan ID %d tidak ditemukan.\n", id);
+        printf("Tidak ada produk yang ditemukan.\n");
     }
 }
 
-void deleteProduct(Product *products, int *count) {
-    if (*count == 0) {
-        printf("Tidak ada produk untuk dihapus.\n");
-        return;
-    }
-
-    int id, found = 0;
-    printf("Masukan ID produk yang ingin dihapus");
+void editProduct(Product *products, int count, const char *store_name) {
+    int id;
+    printf("Masukkan ID produk yang ingin diedit: ");
     scanf("%d", &id);
 
-    for (int i = 0; i < *count; i++) {
+    int found = 0;
+    for (int i = 0; i < count; i++) {
         if (products[i].id == id) {
-            found = 1;
-
-            for (int j = i; j < *count - 1; j++) {
-                products[j] = products[j + 1];
+            if (strcmp(products[i].store_name, store_name) != 0) {
+                printf("Akses ditolak. Anda hanya dapat mengedit produk milik toko Anda.\n");
+                return;
             }
-
-            (*count)--;
-            printf("Produk berhasil dihapus\n", id);
+            printf("Masukkan Nama Produk baru: ");
+            scanf("%s", products[i].name);
+            printf("Masukkan Kategori baru: ");
+            scanf("%s", products[i].category);
+            printf("Masukkan Harga baru: ");
+            scanf("%f", &products[i].price);
+            printf("Masukkan Stok baru: ");
+            scanf("%d", &products[i].stock);
+            found = 1;
             break;
         }
     }
 
     if (!found) {
-        printf("Produk tidak ditemukan.\n", id);
+        printf("Produk dengan ID %d tidak ditemukan.\n", id);
+    } else {
+        printf("Produk berhasil diedit.\n");
+    }
+}
+
+
+void deleteProduct(Product *products, int *count, int max_count, const char *store_name) {
+    int id;
+    printf("Masukkan ID produk yang ingin dihapus: ");
+    scanf("%d", &id);
+
+    int found = 0;
+    for (int i = 0; i < *count; i++) {
+        if (products[i].id == id) {
+            if (strcmp(products[i].store_name, store_name) != 0) {
+                printf("Akses ditolak. Anda hanya dapat menghapus produk milik toko Anda.\n");
+                return;
+            }
+
+            // Pindahkan produk setelah yang dihapus untuk menghapusnya dari array
+            for (int j = i; j < *count - 1; j++) {
+                products[j] = products[j + 1];
+            }
+            (*count)--;  // Kurangi jumlah produk
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("Produk dengan ID %d tidak ditemukan.\n", id);
+    } else {
+        printf("Produk berhasil dihapus.\n");
     }
 }
