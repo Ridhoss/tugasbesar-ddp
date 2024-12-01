@@ -1,2 +1,1 @@
-1,Raihana,1234,082130308398,Jl. Satria Raya,2,Raihana Store
-2,Ridho,123,08123456789,Cimindi,2,Idozz Mart
+1,ridhoss,123,0895,bandung,21000,2,doristore

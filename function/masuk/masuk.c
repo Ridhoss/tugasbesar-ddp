@@ -12,11 +12,11 @@ int BacaFileAkun(struct Akun *akun) {
     if (file == NULL) return 0;
 
     int index = 0;
-    while (fscanf(file, "%d,%49[^,],%49[^,],%49[^,],%49[^,],%d,%49[^\n]\n", 
+    while (fscanf(file, "%d,%49[^,],%49[^,],%15[^,],%49[^,],%d,%d,%49[^\n]\n", 
                 &akun[index].id, akun[index].username, 
                 akun[index].password, akun[index].phone, 
-                akun[index].alamat, &akun[index].role, 
-                akun[index].store_name) == 7) {
+                akun[index].alamat, &akun[index].rekening, &akun[index].role, 
+                akun[index].store_name) == 8) {
 
         // Jika store_name kosong dan role 1, set default string "null"
         if (akun[index].role == 1 && akun[index].store_name[0] == '\0') {
@@ -104,17 +104,17 @@ void DaftarAkun(int role) {
     printf("Masukan Nomor Telepon : ");
     scanf("%s", phone);
     // Membaca alamat
-printf("Masukan Alamat: ");
-getchar(); // Hilangkan karakter newline yang tertinggal di buffer
-fgets(alamat, sizeof(alamat), stdin);
-alamat[strcspn(alamat, "\n")] = '\0'; // Hapus newline jika ada
+    printf("Masukan Alamat: ");
+    getchar(); // Hilangkan karakter newline yang tertinggal di buffer
+    fgets(alamat, sizeof(alamat), stdin);
+    alamat[strcspn(alamat, "\n")] = '\0'; // Hapus newline jika ada
 
-// Membaca nama toko (jika role == 2)
-if (role == 2) {
-    printf("Masukkan Nama Toko: ");
-    fgets(store_name, sizeof(store_name), stdin);
-    store_name[strcspn(store_name, "\n")] = '\0'; // Hapus newline
-}
+    // Membaca nama toko (jika role == 2)
+    if (role == 2) {
+        printf("Masukkan Nama Toko: ");
+        fgets(store_name, sizeof(store_name), stdin);
+        store_name[strcspn(store_name, "\n")] = '\0'; // Hapus newline
+    }
 
     // Tambahkan data pengguna ke file
     file = fopen(users, "a");
@@ -125,12 +125,12 @@ if (role == 2) {
 
     if (role == 1){
         // Jika role adalah user biasa, simpan store_name sebagai "null"
-        fprintf(file, "%d,%s,%s,%s,%s,%d,%s\n", last_id + 1, username, password, phone, alamat, 1, store_name); 
+        fprintf(file, "%d,%s,%s,%s,%s,%d,%d,%s\n", last_id + 1, username, password, phone, alamat, 0, 1, store_name); 
     }else if(role == 2) {
        // Jika role adalah penjual, simpan store_name sesuai input
-        fprintf(file, "%d,%s,%s,%s,%s,%d,%s\n", last_id + 1, username, password, phone, alamat, 2, store_name); 
+        fprintf(file, "%d,%s,%s,%s,%s,%d,%d,%s\n", last_id + 1, username, password, phone, alamat, 0, 2, store_name); 
     }else {
-        fprintf(file, "%d,%s,%s,%s,%s,%d,%s\n", last_id + 1, username, password, phone, alamat, 3, store_name);
+        fprintf(file, "%d,%s,%s,%s,%s,%d,%d,%s\n", last_id + 1, username, password, phone, alamat, 0, 3, store_name);
     }
     fclose(file);
 
@@ -226,7 +226,7 @@ void Masuk(int *loggedIn, int *idLogin) {
 }
 
 // Procedure CariAkun
-void CariAkun(int idLogin, char *username, char *password, char *phone, char *alamat, int *role, char *store_name) {
+void CariAkun(int idLogin, char *username, char *password, char *phone, char *alamat, int *rekening, int *role, char *store_name) {
     struct Akun akun[100];
     int totalAkun;
 
@@ -234,6 +234,7 @@ void CariAkun(int idLogin, char *username, char *password, char *phone, char *al
     for (int i = 0; i < totalAkun; i++) {
         if (akun[i].id == idLogin) {
             *role = akun[i].role;
+            *rekening = akun[i].rekening;
             strcpy(username, akun[i].username);
             strcpy(password, akun[i].password);
             strcpy(phone, akun[i].phone);
@@ -251,12 +252,13 @@ void Logout(int *con){
     *con = 0;
 }
 
-void Clear(int *idLogin, char *username, char *password, char *phone, char *alamat, int *role, char *store_name){
+void Clear(int *idLogin, char *username, char *password, char *phone, char *alamat, int *rekening, int *role, char *store_name){
     strcpy(username,"");
     strcpy(password,"");
     strcpy(store_name,"");
     strcpy(phone,"");
     strcpy(alamat,"");
+    *rekening = 0;
     *role = 0;
     *idLogin = 0;
 }

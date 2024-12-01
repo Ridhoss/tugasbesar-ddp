@@ -3,11 +3,16 @@
 #include <string.h>
 #include "penjual.h"
 #include "../masuk/masuk.h"
+#include "../topup/topup.h"
 
 // Deklarasi global
 const char *file_products = "database/product.txt";
 
-void halamanAdmin(int *loggedIn, int idLogin, char username[50], char password[50], char *phone, char *alamat, int role, char store_name[50]){
+void halamanAdmin(int *loggedIn, int idLogin){
+    char username[50], password[50], phone[16], alamat[50], store_name[50];
+    int rekening, role;
+
+    CariAkun(idLogin, username, password, phone, alamat, &rekening, &role, store_name);
 
     int conlog;
     conlog = *loggedIn;
@@ -24,13 +29,16 @@ void halamanAdmin(int *loggedIn, int idLogin, char username[50], char password[5
 
     int choice;
     do {
-        printf("\n--- Admin ---\n");
+        printf("===========================\n");
+        printf("==== Halaman Admin ====\n");
+        printf("===========================\n");
         printf("1. Tambah Produk\n");
-        printf("2. List Produk\n");
-        printf("3. Simpan Produk\n");
-        printf("4. Edit Produk\n");
-        printf("5. Hapus Produk\n");
-        printf("6. Logout\n");
+        printf("2. Edit Produk\n");
+        printf("3. Hapus Produk\n");
+        printf("4. List Produk\n");
+        printf("5. Simpan Produk\n");
+        printf("6. Cek Rekening\n");
+        printf("7. Logout\n");
         printf("Masukan pilihan: ");
         scanf("%d", &choice);
         switch (choice) {
@@ -38,24 +46,28 @@ void halamanAdmin(int *loggedIn, int idLogin, char username[50], char password[5
                 addProduct(products, &count, MAX_PRODUCTS, store_name);
                 break;
             case 2:
-                viewProduct(products, count, store_name);
-                break;
-            case 3:
-                saveProducts(products, count);
-                break;
-            case 4:
                 editProduct(products, count, store_name);
                 break;
-            case 5:
+            case 3:
                 deleteProduct(products, &count,MAX_PRODUCTS ,store_name);
                 break;
+            case 4:
+                viewProduct(products, count, store_name);
+                break;
+            case 5:
+                saveProducts(products, count);
+                break;
             case 6:
-                printf("Keluar...\n");
+                CekRekening(idLogin);
+                break;
+            case 7:
+                Logout(&conlog);
+                *loggedIn = conlog;
                 break;
             default:
                 printf("Pilihan tidak ada\n");
         }
-    } while (choice != 6);
+    } while (choice != 7);
 }
 
 void addProduct(Product *products, int *count, int max_count, const char *store_name) {
