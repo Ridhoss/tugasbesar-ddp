@@ -1,0 +1,28 @@
+ID: 1
+No. Pesanan: 355
+Pembeli: @
+Kontak: 
+Penjual: @
+Tanggal Pesanan: 01 December 2024
+Nama Produk: Laptop
+Qty: 1
+Harga: Rp. 10000000.00
+Total Harga: Rp. 10000000.00
+Alamat: ìu
+Ekspedisi: JNE
+Status Pembayaran: Sudah dibayar
+===============================
+ID: 1
+No. Pesanan: 771
+Pembeli: @
+Kontak: 
+Penjual: @
+Tanggal Pesanan: 01 December 2024
+Nama Produk: bala bala
+Qty: 1
+Harga: Rp. 20000.00
+Total Harga: Rp. 20000.00
+Alamat: ìu
+Ekspedisi: JNE
+Status Pembayaran: Sudah dibayar
+===============================
