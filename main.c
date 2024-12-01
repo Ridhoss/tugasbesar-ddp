@@ -2,6 +2,7 @@
 #include <string.h>
 #include "function/penjual/penjual.h"
 #include "function/masuk/masuk.h"
+#include "function/pembeli/pembeli.h"
 
 // Main Program
 int main() {
@@ -19,7 +20,9 @@ int main() {
         if (loggedIn == 1) {
             // mencari akun berdasarkan id yang login
             CariAkun(idLogin, username, password, phone, alamat, &rekening, &role, store_name);
-            if (role == 2)
+            if(role == 1){
+                halamanUser(&loggedIn, idLogin);
+            }else if (role == 2)
             {
                 halamanAdmin(&loggedIn, idLogin);
             }

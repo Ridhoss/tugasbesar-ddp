@@ -1,0 +1,6 @@
+{
+	"files.associations": {
+		"penjual.h": "c",
+		"stdio.h": "c"
+	}
+}

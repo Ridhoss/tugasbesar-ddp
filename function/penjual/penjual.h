@@ -7,31 +7,31 @@ typedef struct {
     char category[30];
     float price;
     int stock;
-    char store_name[50];
+    int id_penjual;
 } Product;
 
 // ke halaman admin
 void halamanAdmin(int *loggedIn, int idLogin);
 
 // Menambahkan produk baru ke dalam daftar produk
-void addProduct(Product *products, int *count, int max_count, const char *store_name);
+void addProduct(Product *products, int *count, int max_count, int idLogin);
 
 // Menampilkan semua produk
 void listProducts(Product *products, int count);
 
 // Menyimpan produk ke file
-void saveProducts(Product *products, int count);
+void saveProducts(Product *products, int count, int idLogin);
 
 // Memuat produk dari file
 int loadProducts(Product *products, int max_count);
 
 // Mengedit produk yang dimiliki oleh toko tertentu
-void editProduct(Product *products, int count, const char *store_name);
+void editProduct(Product *products, int count, int idLogin);
 
 // Menghapus produk milik toko tertentu
-void deleteProduct(Product *products, int *count, int max_count, const char *store_name);
+void deleteProduct(Product *products, int *count, int max_count, int idLogin);
 
 // Menampilkan produk milik toko tertentu
-void viewProduct(Product *products, int count, const char *store_name);
+void viewProduct(Product *products, int count, int idLogin);
 
 #endif

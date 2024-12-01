@@ -1,1 +1,2 @@
-1,ridhoss,123,0895,bandung,21000,2,doristore
+1,sachin,123,08695,bandung,0,2,sachinstore
+2,ridhoss,123,089495,cimahi,0,1,null
