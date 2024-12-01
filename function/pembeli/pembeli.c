@@ -7,9 +7,9 @@
 
 // Deklarasi global
 const char *pemesanan = "database/pemesanan.txt";
+const char *keranjang_file = "database/keranjang.txt";
 
-void halamanUser(
-    int *loggedIn, int idLogin) {
+void halamanUser(int *loggedIn, int idLogin) {
     char username[50], password[50], phone[16], alamat[50], store_name[50];
     int rekening, role;
 
@@ -25,14 +25,11 @@ void halamanUser(
     int keranjangCount = 0;
     int statusPesanan = 0;
 
-    // Load produk dari file
-    productCount = bacaFileProduk(products, MAX_PRODUCTS);
-
     int pilihanMenu;
     do {
         printf("\n============================\n");
         printf("    Selamat Datang %s\n", username);
-        printf("============================\n");
+        printf("==============================\n");
         printf("1. Lihat Katalog Produk\n");
         printf("2. Lihat Keranjang\n");
         printf("3. Status Pesanan\n");
@@ -43,32 +40,34 @@ void halamanUser(
 
         switch (pilihanMenu) {
             case 1: {
-                tampilkanKatalog(products, productCount);
-                int pilihanBarang, jumlahBeli;
-                printf("Pilih produk yang akan dibeli: ");
-                scanf("%d", &pilihanBarang);
+                // Load produk dari file
+                productCount = bacaFileProduk(products, MAX_PRODUCTS);
+                tampilkanKatalog(products, productCount, keranjang, keranjangCount);
 
-                if (pilihanBarang >= 1 && pilihanBarang <= productCount) {
-                    printf("Masukkan jumlah produk yang ingin dibeli: ");
-                    scanf("%d", &jumlahBeli);
+                int pilihan = 0;
 
-                    if (jumlahBeli > 0 && jumlahBeli <= products[pilihanBarang - 1].stock) {
-                        tambahKeKeranjang(
-                            keranjang, &keranjangCount, products, 
-                            pilihanBarang, jumlahBeli
-                        );
-                        products[pilihanBarang - 1].stock -= jumlahBeli;
-                        printf("Produk berhasil ditambahkan ke keranjang!\n");
-                    } else {
-                        printf("Jumlah tidak valid atau stok tidak mencukupi!\n");
+                for(;;){
+                    printf("============================\n");
+                    printf("1. Beli Barang\n");
+                    printf("2. Kembali\n");
+                    printf("Apakah ingin membeli barang = ");
+                    scanf("%d", &pilihan);
+
+                    if (pilihan == 1)
+                    {
+                        BeliBarang(idLogin, products, MAX_PRODUCTS);
+                        break;
+
+                    }else if(pilihan == 2)
+                    {
+                        break;
                     }
-                } else {
-                    printf("Pilihan produk tidak valid!\n");
                 }
+                
                 break;
             }
             case 2: {
-                tampilkanKeranjang(keranjang, keranjangCount);
+                tampilkanKeranjangDariFile();
                 int pilihanKeranjang;
                 printf("1. Kembali\n");
                 printf("2. Checkout\n");
@@ -86,6 +85,7 @@ void halamanUser(
                 } else if (pilihanKeranjang == 3) {
                     hapusDariKeranjang(keranjang, &keranjangCount);
                 }
+
                 break;
             }
             case 3: {
@@ -107,6 +107,40 @@ void halamanUser(
     } while (*loggedIn && pilihanMenu != 4);
 }
 
+void BeliBarang(int loggedIn, Product products[], int maxProducts) {
+    int productCount = 0;
+    Keranjang keranjang[100];
+    int keranjangCount = 0;
+
+    for(;;){
+        // Load produk dari file
+        productCount = bacaFileProduk(products, maxProducts);
+        tampilkanKatalog(products, productCount, keranjang, keranjangCount);
+
+
+        printf("============================\n");
+        printf("Pilih produk yang akan dibeli: ");
+        int pilihanBarang;
+        scanf("%d", &pilihanBarang);
+
+        if (pilihanBarang >= 1 && pilihanBarang <= productCount) {
+            printf("Masukkan jumlah produk yang ingin dibeli: ");
+            int jumlahBeli;
+            scanf("%d", &jumlahBeli);
+
+            if (jumlahBeli > 0) {
+                tambahKeKeranjang(keranjang, &keranjangCount, products, pilihanBarang, jumlahBeli);
+                break;
+            } else {
+                printf("Jumlah tidak valid!\n");
+            }
+            
+        } else {
+            printf("Pilihan produk tidak valid!\n");
+        }
+    }
+}
+
 int bacaFileProduk(Product products[], int maxProducts) {
     FILE *file = fopen(file_products, "r");
     if (!file) {
@@ -123,10 +157,7 @@ int bacaFileProduk(Product products[], int maxProducts) {
         }
 
         Product p;
-        if (sscanf(
-            line, "%d,%49[^,],%29[^,],%f,%d,%d",
-            &p.id, p.name, p.category, &p.price, &p.stock, &p.id_penjual
-        ) == 6) {
+        if (sscanf(line, "%d,%49[^,],%29[^,],%d,%d,%d", &p.id, p.name, p.category, &p.price, &p.stock, &p.id_penjual) == 6) {
             products[count++] = p;
         } else {
             printf("Gagal mem-parsing baris: %s\n", line);
@@ -153,7 +184,17 @@ void formatRibuan(int angka, char *output) {
     output[pos] = '\0';
 }
 
-void tampilkanKatalog(Product products[], int jumlahProduk) {
+int hitungStokTersedia(Product *product, Keranjang keranjang[], int keranjangCount) {
+    int jumlahDiKeranjang = 0;
+    for (int i = 0; i < keranjangCount; i++) {
+        if (strcmp(product->name, keranjang[i].nama) == 0) {
+            jumlahDiKeranjang += keranjang[i].jumlah;
+        }
+    }
+    return product->stock - jumlahDiKeranjang;
+}
+
+void tampilkanKatalog(Product products[], int jumlahProduk, Keranjang keranjang[], int keranjangCount) {
     printf("\n============================\n");
     printf("         KATALOG\n");
     printf("============================\n");
@@ -161,35 +202,105 @@ void tampilkanKatalog(Product products[], int jumlahProduk) {
     char hargaFormatted[20];
     for (int i = 0; i < jumlahProduk; i++) {
         formatRibuan((int)products[i].price, hargaFormatted);
+        int stokTersedia = hitungStokTersedia(&products[i], keranjang, keranjangCount);
         printf("ID: %d\n", products[i].id);
         printf("Nama: %s\n", products[i].name);
         printf("Kategori: %s\n", products[i].category);
         printf("Harga: Rp.%s\n", hargaFormatted);
-        printf("Stok: %d\n", products[i].stock);
+        printf("Stok: %d\n", stokTersedia);
         printf("Toko: %d\n", products[i].id_penjual);
         printf("----------------------------\n");
     }
 }
 
-void tambahKeKeranjang(
-    Keranjang keranjang[], int *keranjangCount, Product products[], 
-    int pilihanProduk, int jumlahBeli) {
+void simpanKeranjangKeFile(Keranjang keranjang[], int keranjangCount) {
+    FILE *file = fopen(keranjang_file, "w");
+    if (!file) {
+        printf("Gagal menyimpan keranjang ke file.\n");
+        return;
+    }
+    for (int i = 0; i < keranjangCount; i++) {
+        fprintf(file, "%s,%d,%d\n", keranjang[i].nama, keranjang[i].jumlah, keranjang[i].harga);
+    }
+    fclose(file);
+}
+
+int bacaKeranjangDariFile(Keranjang keranjang[]) {
+    FILE *file = fopen(keranjang_file, "r");
+    if (!file) {
+        printf("Keranjang kosong atau file tidak ditemukan.\n");
+        return 0;
+    }
+    int count = 0;
+    while (fscanf(file, "%[^,],%d,%d\n", keranjang[count].nama, &keranjang[count].jumlah, &keranjang[count].harga) == 3) {
+        count++;
+    }
+    fclose(file);
+    return count;
+}
+
+void konfirmasiPembelian(Product products[], int jumlahProduk, Keranjang keranjang[], int keranjangCount) {
+    for (int i = 0; i < keranjangCount; i++) {
+        for (int j = 0; j < jumlahProduk; j++) {
+            if (strcmp(products[j].name, keranjang[i].nama) == 0) {
+                products[j].stock -= keranjang[i].jumlah;
+            }
+        }
+    }
+    tulisUlangFileProduk(products, jumlahProduk);
+    printf("Pesanan dikonfirmasi dan stok diperbarui di file produk.\n");
+
+    // Kosongkan keranjang
+    FILE *file = fopen("keranjang.txt", "w");
+    if (file) fclose(file);
+}
+
+
+void tambahKeKeranjang(Keranjang keranjang[], int *keranjangCount, Product products[], int pilihanProduk, int jumlahBeli) {
 
     if (products[pilihanProduk - 1].stock < jumlahBeli) {
         printf("Stok tidak mencukupi! Tersedia: %d\n", products[pilihanProduk - 1].stock);
         return;
     }
 
+    // Tambahkan produk ke keranjang
     keranjang[*keranjangCount].jumlah = jumlahBeli;
     strcpy(keranjang[*keranjangCount].nama, products[pilihanProduk - 1].name);
     keranjang[*keranjangCount].harga = products[pilihanProduk - 1].price;
 
-    products[pilihanProduk - 1].stock -= jumlahBeli;
     (*keranjangCount)++;
     printf("Barang berhasil ditambahkan ke keranjang!\n");
+
+    // Simpan keranjang ke file
+    simpanKeranjangKeFile(keranjang, *keranjangCount);
 }
 
-void tampilkanKeranjang(Keranjang keranjang[], int keranjangCount) {
+
+void tulisUlangFileProduk(Product products[], int jumlahProduk) {
+    FILE *file = fopen(file_products, "w");
+    if (!file) {
+        printf("Gagal membuka file untuk menulis ulang.\n");
+        return;
+    }
+
+    for (int i = 0; i < jumlahProduk; i++) {
+        fprintf(file, "%d,%s,%s,%d,%d,%d\n",
+                products[i].id,
+                products[i].name,
+                products[i].category,
+                products[i].price,
+                products[i].stock,
+                products[i].id_penjual);
+    }
+
+    fclose(file);
+    printf("Stok berhasil diperbarui di file.\n");
+}
+
+void tampilkanKeranjangDariFile() {
+    Keranjang keranjang[100];
+    int keranjangCount = bacaKeranjangDariFile(keranjang); // Membaca keranjang dari file
+
     printf("\n============================\n");
     printf("         KERANJANG\n");
     printf("============================\n");
@@ -200,17 +311,29 @@ void tampilkanKeranjang(Keranjang keranjang[], int keranjangCount) {
     }
 
     char hargaFormatted[20];
+    char totalHargaFormatted[20];
+    int totalHargaKeseluruhan = 0;
+
     for (int i = 0; i < keranjangCount; i++) {
         formatRibuan((int)keranjang[i].harga, hargaFormatted);
-        printf("Barang %d\n", i + 1);
-        printf("Nama: %s\n", keranjang[i].nama);
-        printf("Jumlah: %d\n", keranjang[i].jumlah);
-        printf("Harga Satuan: Rp.%s\n", hargaFormatted);
+        int totalHargaBarang = keranjang[i].harga * keranjang[i].jumlah;
+        totalHargaKeseluruhan += totalHargaBarang;
+        formatRibuan(totalHargaBarang, totalHargaFormatted);
+        
+        printf("Barang %d:\n", i + 1);
+        printf("  Nama           : %s\n", keranjang[i].nama);
+        printf("  Jumlah         : %d\n", keranjang[i].jumlah);
+        printf("  Harga Satuan   : Rp.%s\n", hargaFormatted);
+        printf("  Total Harga    : Rp.%s\n", totalHargaFormatted);
         printf("----------------------------\n");
     }
+
+    formatRibuan(totalHargaKeseluruhan, totalHargaFormatted);
+    printf("Total Harga Keseluruhan: Rp.%s\n", totalHargaFormatted);
+    printf("============================\n");
 }
 
-// Fungsi untuk checkout keranjang
+
 void checkout(Keranjang keranjang[], int keranjangCount, int *statusPesanan, 
               const char *pembeli, const char *kontak, const char *penjual, 
               const char *alamat, const char *ekspedisi) {
@@ -245,7 +368,6 @@ void checkout(Keranjang keranjang[], int keranjangCount, int *statusPesanan,
     }
 }
 
-// Fungsi untuk menulis pesanan ke file
 void tulisPesanan(Keranjang keranjang[], int keranjangCount, const char *pembeli, const char *kontak, const char *penjual, const char *alamat, const char *ekspedisi, int statusPembayaran) {
 
     FILE *file = fopen(pemesanan, "a"); // Buka file dalam mode append

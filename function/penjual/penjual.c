@@ -94,7 +94,7 @@ void addProduct(Product *products, int *count, int max_count, int idLogin) {
     printf("Masukkan kategori produk: ");
     scanf(" %[^\n]", newProduct.category);
     printf("Masukkan harga produk: ");
-    scanf("%f", &newProduct.price);
+    scanf("%d", &newProduct.price);
     printf("Masukkan stok produk: ");
     scanf("%d", &newProduct.stock);
     newProduct.id_penjual = idLogin;
@@ -127,7 +127,7 @@ void saveProducts(Product *products, int count, int idLogin) {
     }
 
     for (int i = 0; i < count; i++) {
-        fprintf(file, "%d,%s,%s,%.2f,%d,%d\n", 
+        fprintf(file, "%d,%s,%s,%d,%d,%d\n", 
                 products[i].id, products[i].name, products[i].category, 
                 products[i].price, products[i].stock, products[i].id_penjual);
     }
@@ -146,7 +146,7 @@ int loadProducts(Product *products, int max_count) {
     int count = 0;
     printf("Memuat produk...\n");
 
-    while (fscanf(file, "%d,%49[^,],%29[^,],%f,%d,%d\n",
+    while (fscanf(file, "%d,%49[^,],%29[^,],%d,%d,%d\n",
                   &products[count].id, products[count].name,
                   products[count].category, &products[count].price,
                   &products[count].stock, products[count].id_penjual) == 6) {
@@ -177,7 +177,7 @@ void viewProduct(Product *products, int count, int idLogin) {
     printf("Produk yang dimiliki oleh toko %d:\n", idLogin);
     for (int i = 0; i < count; i++) {
         if (products[i].id_penjual == idLogin) {
-            printf("ID: %d, Nama: %s, Kategori: %s, Harga: %.2f, Stok: %d\n",
+            printf("ID: %d, Nama: %s, Kategori: %s, Harga: %d, Stok: %d\n",
                 products[i].id, products[i].name, products[i].category,
                 products[i].price, products[i].stock);
             found = 1;
