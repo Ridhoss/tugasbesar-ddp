@@ -149,7 +149,7 @@ int loadProducts(Product *products, int max_count) {
     while (fscanf(file, "%d,%49[^,],%29[^,],%d,%d,%d\n",
                   &products[count].id, products[count].name,
                   products[count].category, &products[count].price,
-                  &products[count].stock, products[count].id_penjual) == 6) {
+                  &products[count].stock, &products[count].id_penjual) == 6) {
         // Cek duplikasi ID
         int isDuplicate = 0;
         for (int i = 0; i < count; i++) {
