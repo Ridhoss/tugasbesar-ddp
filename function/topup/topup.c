@@ -18,8 +18,8 @@ void CekRekening(int idLogin) {
 
     for (;;) {
         printf("1. Topup Rekening\n");
-        printf("2. Kembali Ke Halaman Admin\n");
-        printf("Pilih : \n");
+        printf("2. Kembali Ke Halaman Utama\n");
+        printf("Pilih : ");
         scanf("%d", &pilih);
 
         if (pilih == 1) {
@@ -33,6 +33,18 @@ void CekRekening(int idLogin) {
             printf("=======================\n");
         }
     }
+}
+
+int HanyaTampilkanSaldo(int idLogin) {
+    char username[50], password[50], phone[16], alamat[50], store_name[50];
+    int rekening, role;
+
+    CariAkun(idLogin, username, password, phone, alamat, &rekening, &role, store_name);
+
+    printf("===========================\n");
+    printf("Saldo Rekening Anda = Rp.%d\n", rekening);
+
+    return rekening;
 }
 
 

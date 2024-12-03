@@ -34,4 +34,6 @@ void deleteProduct(Product *products, int *count, int max_count, int idLogin);
 // Menampilkan produk milik toko tertentu
 void viewProduct(Product *products, int count, int idLogin);
 
+int bacaProductDariFile(Product product[], int idBarang);
+
 #endif

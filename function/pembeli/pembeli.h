@@ -34,9 +34,9 @@ void simpanKeranjangKeFile(Keranjang keranjang[], int keranjangCount);
 
 void tulisUlangFileProduk(Product products[], int jumlahProduk);
 
-void checkout(Keranjang keranjang[], int keranjangCount, int *statusPesanan, const char *pembeli, const char *kontak, const char *penjual, const char *alamat, const char *ekspedisi);
+void checkout(int idLogin);
 
-void tulisPesanan(Keranjang keranjang[], int keranjangCount, const char *pembeli, const char *kontak, const char *penjual, const char *alamat, const char *ekspedisi, int statusPembayaran);
+void tulisPesanan(int idLogin);
 
 void bacaFilePesanan();
 

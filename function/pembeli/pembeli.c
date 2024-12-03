@@ -1,6 +1,7 @@
 #include "pembeli.h"
 #include "../penjual/penjual.h"
 #include "../masuk/masuk.h"
+#include "../topup/topup.h"
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
@@ -25,6 +26,7 @@ void halamanUser(int *loggedIn, int idLogin) {
     int keranjangCount = 0;
     int statusPesanan = 0;
 
+
     int pilihanMenu;
     do {
         printf("\n============================\n");
@@ -33,7 +35,8 @@ void halamanUser(int *loggedIn, int idLogin) {
         printf("1. Lihat Katalog Produk\n");
         printf("2. Lihat Keranjang\n");
         printf("3. Status Pesanan\n");
-        printf("4. Logout\n");
+        printf("4. Cek Rekening\n");
+        printf("5. Logout\n");
         printf("============================\n");
         printf("Pilih menu: ");
         scanf("%d", &pilihanMenu);
@@ -76,12 +79,7 @@ void halamanUser(int *loggedIn, int idLogin) {
                 scanf("%d", &pilihanKeranjang);
 
                 if (pilihanKeranjang == 2) {
-                    if (keranjangCount > 0) {
-                        checkout(keranjang, keranjangCount, &statusPesanan, username, phone, store_name, alamat, "JNE");
-                        keranjangCount = 0;
-                    } else {
-                        printf("Keranjang kosong, tidak dapat checkout.\n");
-                    }
+                        checkout(idLogin);
                 } else if (pilihanKeranjang == 3) {
                     hapusDariKeranjang(idLogin);
                 }
@@ -98,13 +96,17 @@ void halamanUser(int *loggedIn, int idLogin) {
                 break;
             }
             case 4:
+                // cek rekening
+                CekRekening(idLogin);
+                break;
+            case 5:
                 Logout(&conlog);
                 *loggedIn = conlog;
                 break;
             default:
                 printf("Pilihan menu tidak valid.\n");
         }
-    } while (*loggedIn && pilihanMenu != 4);
+    } while (*loggedIn && pilihanMenu != 5);
 }
 
 void formatRibuan(int angka, char *output) {
@@ -170,7 +172,6 @@ void BeliBarang(int idLogin, Product products[], int maxProducts) {
         }
     }
 }
-
 
 int bacaFileProduk(Product products[], int maxProducts) {
     FILE *file = fopen(file_products, "r");
@@ -240,7 +241,6 @@ void tampilkanKatalog(Product products[], int jumlahProduk, int idLogin) {
 }
 
 //! KERANJANG
-
 void simpanKeranjangKeFile(Keranjang keranjang[], int keranjangCount) {
     FILE *file = fopen(keranjang_file, "w");
     if (!file) {
@@ -325,7 +325,6 @@ int bacaKeranjangDariFile(Keranjang keranjang[], int idLogin) {
     fclose(file);
     return count;
 }
-
 
 void konfirmasiPembelian(Product products[], int jumlahProduk, Keranjang keranjang[], int keranjangCount) {
     for (int i = 0; i < keranjangCount; i++) {
@@ -421,40 +420,75 @@ void tulisUlangFileProduk(Product products[], int jumlahProduk) {
     printf("Stok berhasil diperbarui di file.\n");
 }
 
+void checkout(int idLogin) {
+    int totalHarga = 0;
+    int saldo = 0;
 
-void checkout(Keranjang keranjang[], int keranjangCount, int *statusPesanan, const char *pembeli, const char *kontak, const char *penjual, const char *alamat, const char *ekspedisi) {
-    float totalHarga = 0;
+    Keranjang keranjang[100];
+    int keranjangCount = bacaKeranjangDariFile(keranjang, idLogin);
+
+    int metodePembayaran = 0;
+    char konfpem;
+
     for (int i = 0; i < keranjangCount; i++) {
         totalHarga += keranjang[i].harga * keranjang[i].jumlah;
     }
 
-    printf("Total Harga: Rp. %.2f\n", totalHarga);
+    printf("============================\n");
+    printf("Total Pembayaran: Rp. %d\n", totalHarga);
+    printf("============================\n");
     printf("Silahkan pilih metode pembayaran:\n");
-    printf("1. BCA\n");
-    printf("2. BRI\n");
-    printf("3. MANDIRI\n");
+    printf("1. RisaizPay\n");
     printf("Pilih: ");
-    int metodePembayaran;
     scanf("%d", &metodePembayaran);
 
-    if (metodePembayaran >= 1 && metodePembayaran <= 3) {
-        printf("Masukkan nominal pembayaran: ");
-        float nominal;
-        scanf("%f");
+    if (metodePembayaran == 1) {
+        saldo = HanyaTampilkanSaldo(idLogin);
+        printf("Lakukan Pembayaran Sebesar Rp.%d\n", totalHarga);
+        printf("============================\n");
+        printf("Konfirmasi Pembayaran (y/n): ");
+        scanf("%s", &konfpem);
 
-        if (nominal >= totalHarga) {
-            printf("Pembayaran berhasil! Kembalian Anda: Rp. %.2f\n", nominal - totalHarga);
-            *statusPesanan = 1;
-            tulisPesanan(keranjang, keranjangCount, pembeli, kontak, penjual, alamat, ekspedisi, *statusPesanan);
-        } else {
-            printf("Pembayaran gagal! Nominal kurang dari total harga.\n");
+        if (konfpem == 'y' || konfpem == 'Y')
+        {
+            // lakukan checkout pembayaran
+            if (totalHarga <= saldo)
+            {
+                tulisPesanan(idLogin);
+            }else {
+                printf("============================\n");
+                printf("Saldo anda tidak mencukupi!! Silahkan lakukan TopUp!\n");
+                printf("============================\n");
+            }
+
+        }else if(konfpem == 'n' || konfpem == 'N') {
+            printf("============================\n");
+            printf("Pembayaran Dibatalkan\n");
+            printf("============================\n");
+            return;
+        }else {
+            printf("Input Tidak Valid\n");
         }
     } else {
         printf("Metode pembayaran tidak valid!\n");
     }
 }
 
-void tulisPesanan(Keranjang keranjang[], int keranjangCount, const char *pembeli, const char *kontak, const char *penjual, const char *alamat, const char *ekspedisi, int statusPembayaran) {
+//! tulis pesanan punya faiz
+
+void tulisPesanan(int idLogin) {
+
+    char username[50], password[50], phone[16], alamat[50], store_name[50];
+    int rekening, role;
+    CariAkun(idLogin, username, password, phone, alamat, &rekening, &role, store_name);
+
+    Keranjang keranjang[100];
+    int keranjangCount = bacaKeranjangDariFile(keranjang, idLogin);
+    int totalHarga = 0;
+
+    for (int i = 0; i < keranjangCount; i++) {
+        totalHarga += keranjang[i].harga * keranjang[i].jumlah;
+    }
 
     FILE *file = fopen(pemesanan, "a"); // Buka file dalam mode append
     if (file == NULL) {
@@ -479,29 +513,45 @@ void tulisPesanan(Keranjang keranjang[], int keranjangCount, const char *pembeli
     }
 
     // Dapatkan tanggal saat ini
-    time_t now = time(NULL);
-    struct tm *local = localtime(&now);
-    char tanggalPesanan[50];
-    strftime(tanggalPesanan, sizeof(tanggalPesanan), "%d %B %Y", local);
+    char tanggalPesanan[15]; // Array untuk menyimpan tanggal
+    char waktuPesanan[10];   // Array untuk menyimpan waktu
+
+    // Mendapatkan waktu saat ini
+    time_t t = time(NULL);
+    struct tm *waktu = localtime(&t);
+
+    // Format tanggal dan waktu secara terpisah
+    snprintf(tanggalPesanan, sizeof(tanggalPesanan), "%02d-%02d-%04d", waktu->tm_mday, waktu->tm_mon + 1, waktu->tm_year + 1900);
+
+    snprintf(waktuPesanan, sizeof(waktuPesanan), "%02d:%02d:%02d", waktu->tm_hour, waktu->tm_min, waktu->tm_sec);
 
     // Randomize nomor pesanan
     srand(time(0));
     int noPesanan = rand() % 900 + 100; // Random angka 100-999
 
-    fprintf(file, "%d,%d,%s,%s,%s,%s,", last_id + 1, noPesanan, pembeli, kontak, penjual, tanggalPesanan);
-
-    // Tulis informasi setiap produk dalam keranjang
-    float totalHarga = 0;
+    
     for (int i = 0; i < keranjangCount; i++) {
-        float hargaTotal = keranjang[i].harga * keranjang[i].jumlah;
-        totalHarga += hargaTotal;
+        
+        int hargaTotal = keranjang[i].harga * keranjang[i].jumlah;
 
-        fprintf(file, "%d,%d,%d,%d,", keranjang[i].id, keranjang[i].jumlah, keranjang[i].harga, hargaTotal);
+        Product product[100];
+        int productCount = bacaProductDariFile(product, keranjang[i].id_barang);
+
+        //! ABIS DI CO KERANJANG BELOM ILANG
+        //! ID KURIR JUGA BELOM BISAA
+        //! nomor pemesanan kalo bisa formatnya tanggal terus increment contoh 03122401 - 031224 tanggal hari ini - 01 increment, jadi next nomor pemesanann di hari ini berarti jadi 02.
+
+        fprintf(file, "%d,%d,%d,%d,%d,%s,", 
+                last_id + 1, noPesanan, idLogin, product->id_penjual, 0, tanggalPesanan); 
+
+        fprintf(file, "%d,%d,%d,%d,", keranjang[i].id_barang, keranjang[i].jumlah, keranjang[i].harga, hargaTotal);
+
+        fprintf(file, "%s,%s,%s\n", alamat, "GoRisaiz", "Belum dibayar");
+
+        last_id++;
     }
 
-    fprintf(file, "%s,%s,%s\n", alamat, ekspedisi, statusPembayaran ? "Sudah dibayar" : "Belum dibayar");
-
-    fclose(file); // Tutup file
+    fclose(file); 
     printf("Pesanan berhasil disimpan ke file %s.\n", pemesanan);
 }
 

@@ -106,7 +106,6 @@ void addProduct(Product *products, int *count, int max_count, int idLogin) {
     printf("Produk berhasil ditambahkan dengan ID: %d\n", newProduct.id);
 }
 
-
 void listProducts(Product *products, int count) {
     if (count == 0) {
         printf("Produk Kosong\n");
@@ -169,7 +168,6 @@ int loadProducts(Product *products, int max_count) {
     return count;
 }
 
-
 // Untuk menampilkan produk milik toko tertentu
 void viewProduct(Product *products, int count, int idLogin) {
     int found = 0;
@@ -221,7 +219,6 @@ void editProduct(Product *products, int count, int idLogin) {
     }
 }
 
-
 void deleteProduct(Product *products, int *count, int max_count, int idLogin) {
     int id;
     printf("Masukkan ID produk yang ingin dihapus: ");
@@ -250,4 +247,31 @@ void deleteProduct(Product *products, int *count, int max_count, int idLogin) {
     } else {
         printf("Produk berhasil dihapus.\n");
     }
+}
+
+int bacaProductDariFile(Product product[], int idBarang) {
+    FILE *file = fopen(file_products, "r");
+    if (!file) {
+        printf("Product kosong atau file tidak ditemukan.\n");
+        return 0;
+    }
+
+    int count = 0;
+    char temp_name[50];
+    char temp_category[30];
+    int temp_id, temp_price, temp_stock, temp_id_penjual;
+
+    while (fscanf(file, "%d,%49[^,],%29[^,],%d,%d,%d\n", &temp_id, temp_name, temp_category, &temp_price, &temp_stock, &temp_id_penjual) == 6) {
+        if (temp_id == idBarang) {
+            product[count].id = temp_id;
+            strcpy(product[count].name, temp_name);;
+            strcpy(product[count].category, temp_category);;
+            product[count].price = temp_price;
+            product[count].stock = temp_stock;
+            product[count].id_penjual = temp_id_penjual;
+            count++;
+        }
+    }
+    fclose(file);
+    return count;
 }
