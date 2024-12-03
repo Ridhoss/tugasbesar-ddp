@@ -455,6 +455,12 @@ void checkout(int idLogin) {
             if (totalHarga <= saldo)
             {
                 tulisPesanan(idLogin);
+                FILE *file = fopen(keranjang_file, "w");
+                if (file == NULL) {
+                    perror("Gagal membuka file");
+                } else {
+                    fclose(file);
+                }
             }else {
                 printf("============================\n");
                 printf("Saldo anda tidak mencukupi!! Silahkan lakukan TopUp!\n");
