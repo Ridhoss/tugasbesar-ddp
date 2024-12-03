@@ -483,7 +483,6 @@ void checkout(int idLogin) {
 //! tulis pesanan punya faiz
 
 void tulisPesanan(int idLogin) {
-
     char username[50], password[50], phone[16], alamat[50], store_name[50];
     int rekening, role;
     CariAkun(idLogin, username, password, phone, alamat, &rekening, &role, store_name);
@@ -496,7 +495,7 @@ void tulisPesanan(int idLogin) {
         totalHarga += keranjang[i].harga * keranjang[i].jumlah;
     }
 
-    FILE *file = fopen(pemesanan, "a"); // Buka file dalam mode append
+    FILE *file = fopen(pemesanan, "a");
     if (file == NULL) {
         printf("Gagal membuka file %s untuk menyimpan pesanan!\n", pemesanan);
         return;
@@ -504,7 +503,7 @@ void tulisPesanan(int idLogin) {
 
     int last_id = 0;
 
-    // Cari id terakhir
+    // Cari id_pesanan terakhir
     FILE *cekpes = fopen(pemesanan, "r");
     if (cekpes != NULL) {
         char line[200];
@@ -519,47 +518,60 @@ void tulisPesanan(int idLogin) {
     }
 
     // Dapatkan tanggal saat ini
-    char tanggalPesanan[15]; // Array untuk menyimpan tanggal
-    char waktuPesanan[10];   // Array untuk menyimpan waktu
-
-    // Mendapatkan waktu saat ini
+    char tanggalPesanan[15];
     time_t t = time(NULL);
     struct tm *waktu = localtime(&t);
 
-    // Format tanggal dan waktu secara terpisah
-    snprintf(tanggalPesanan, sizeof(tanggalPesanan), "%02d-%02d-%04d", waktu->tm_mday, waktu->tm_mon + 1, waktu->tm_year + 1900);
+    snprintf(tanggalPesanan, sizeof(tanggalPesanan), "%02d%02d%02d", 
+             waktu->tm_mday, waktu->tm_mon + 1, (waktu->tm_year + 1900) % 100);
 
-    snprintf(waktuPesanan, sizeof(waktuPesanan), "%02d:%02d:%02d", waktu->tm_hour, waktu->tm_min, waktu->tm_sec);
+    // Cek increment terakhir untuk nomor pesanan
+    int increment = 1;
+    cekpes = fopen(pemesanan, "r");
+    if (cekpes != NULL) {
+        char line[200];
+        char existingDate[7];
+        int tempIncrement;
 
-    // Randomize nomor pesanan
-    srand(time(0));
-    int noPesanan = rand() % 900 + 100; // Random angka 100-999
+        while (fgets(line, sizeof(line), cekpes)) {
+            char tempNomorPesanan[20];
+            sscanf(line, "%*d,%[^,],%*d,%*d,%*d,%*[^,]", tempNomorPesanan);
+            strncpy(existingDate, tempNomorPesanan, 6);
+            existingDate[6] = '\0';
 
-    
+            if (strcmp(existingDate, tanggalPesanan) == 0) {
+                sscanf(tempNomorPesanan + 6, "%2d", &tempIncrement);
+                if (tempIncrement >= increment) {
+                    increment = tempIncrement + 1;
+                }
+            }
+        }
+        fclose(cekpes);
+    }
+
+    // Buat nomor pesanan baru
+    char nomorPesanan[20];
+    snprintf(nomorPesanan, sizeof(nomorPesanan), "%s%02d", tanggalPesanan, increment);
+
+    // Simpan pesanan ke dalam file
     for (int i = 0; i < keranjangCount; i++) {
-        
         int hargaTotal = keranjang[i].harga * keranjang[i].jumlah;
 
         Product product[100];
         int productCount = bacaProductDariFile(product, keranjang[i].id_barang);
 
-        //! ABIS DI CO KERANJANG BELOM ILANG
-        //! ID KURIR JUGA BELOM BISAA
-        //! nomor pemesanan kalo bisa formatnya tanggal terus increment contoh 03122401 - 031224 tanggal hari ini - 01 increment, jadi next nomor pemesanann di hari ini berarti jadi 02.
-
-        fprintf(file, "%d,%d,%d,%d,%d,%s,", 
-                last_id + 1, noPesanan, idLogin, product->id_penjual, 0, tanggalPesanan); 
-
+        fprintf(file, "%d,%s,%d,%d,%d,%s,", last_id + 1, nomorPesanan, idLogin, product->id_penjual, 0, tanggalPesanan);
         fprintf(file, "%d,%d,%d,%d,", keranjang[i].id_barang, keranjang[i].jumlah, keranjang[i].harga, hargaTotal);
-
         fprintf(file, "%s,%s,%s,%s\n", alamat, "GoRisaiz", "Belum Dikonfirmasi", "Belum Dikirim");
 
         last_id++;
     }
 
-    fclose(file); 
+    fclose(file);
     printf("Pesanan berhasil disimpan ke file %s.\n", pemesanan);
 }
+
+
 
 // Fungsi untuk membaca file pesanan
 void bacaFilePesanan() {
