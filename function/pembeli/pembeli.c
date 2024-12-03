@@ -546,7 +546,7 @@ void tulisPesanan(int idLogin) {
 
         fprintf(file, "%d,%d,%d,%d,", keranjang[i].id_barang, keranjang[i].jumlah, keranjang[i].harga, hargaTotal);
 
-        fprintf(file, "%s,%s,%s\n", alamat, "GoRisaiz", "Belum dibayar");
+        fprintf(file, "%s,%s,%s,%s\n", alamat, "GoRisaiz", "Belum Dikonfirmasi", "Belum Dikirim");
 
         last_id++;
     }
