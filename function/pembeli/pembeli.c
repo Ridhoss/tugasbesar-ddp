@@ -83,7 +83,7 @@ void halamanUser(int *loggedIn, int idLogin) {
                         printf("Keranjang kosong, tidak dapat checkout.\n");
                     }
                 } else if (pilihanKeranjang == 3) {
-                    hapusDariKeranjang(keranjang, &keranjangCount);
+                    hapusDariKeranjang(idLogin);
                 }
 
                 break;
@@ -301,8 +301,6 @@ void tambahKeKeranjang(int idLogin, Keranjang keranjang[], int *keranjangCount, 
     // Simpan keranjang ke file
     simpanKeranjangKeFile(keranjang, *keranjangCount);
 }
-
-
 
 int bacaKeranjangDariFile(Keranjang keranjang[], int idLogin) {
     FILE *file = fopen(keranjang_file, "r");
@@ -526,18 +524,64 @@ void bacaFilePesanan() {
     fclose(file);
 }
 
-// Fungsi untuk menghapus barang dari keranjang
-void hapusDariKeranjang(Keranjang keranjang[], int *keranjangCount) {
+// Fungsi untuk menghapus atau mengurangi qty barang di keranjang
+void hapusDariKeranjang(int idLogin) {
+    Keranjang keranjang[100];
+    int keranjangCount = bacaKeranjangDariFile(keranjang, idLogin);
+
+    if (keranjangCount == 0) {
+        printf("Keranjang kosong.\n");
+        return;
+    }
+
+    printf("\nDaftar barang dalam keranjang:\n");
+    for (int i = 0; i < keranjangCount; i++) {
+        printf("%d. ID Barang: %d, Jumlah: %d, Harga: %d\n", i + 1, keranjang[i].id_barang, keranjang[i].jumlah, keranjang[i].harga);
+        printf("============================\n");
+    }
+
     int hapusBarang;
-    printf("Masukkan nomor barang yang ingin dihapus (1-%d): ", *keranjangCount);
+    printf("Masukkan nomor barang yang ingin diubah (1-%d): ", keranjangCount);
     scanf("%d", &hapusBarang);
 
-    if (hapusBarang >= 1 && hapusBarang <= *keranjangCount) {
-        for (int i = hapusBarang - 1; i < *keranjangCount - 1; i++) {
-            keranjang[i] = keranjang[i + 1];
+    if (hapusBarang >= 1 && hapusBarang <= keranjangCount) {
+        int index = hapusBarang - 1;
+
+        printf("Pilih tindakan:\n1. Hapus semua\n2. Kurangi qty\nMasukkan pilihan (1/2): ");
+        int pilihan;
+        scanf("%d", &pilihan);
+
+        if (pilihan == 1) {
+            for (int i = index; i < keranjangCount - 1; i++) {
+                keranjang[i] = keranjang[i + 1];
+            }
+            keranjangCount--;
+            printf("Barang berhasil dihapus dari keranjang!\n");
+
+        } else if (pilihan == 2) {
+            int qtyKurang;
+            printf("Masukkan jumlah qty yang ingin dikurangi (1-%d): ", keranjang[index].jumlah);
+            scanf("%d", &qtyKurang);
+
+            if (qtyKurang >= 1 && qtyKurang <= keranjang[index].jumlah) {
+                keranjang[index].jumlah -= qtyKurang;
+                if (keranjang[index].jumlah == 0) {
+                    for (int i = index; i < keranjangCount - 1; i++) {
+                        keranjang[i] = keranjang[i + 1];
+                    }
+                    keranjangCount--;
+                    printf("Semua qty telah dikurangi, barang dihapus dari keranjang!\n");
+                } else {
+                    printf("Jumlah barang dikurangi menjadi %d.\n", keranjang[index].jumlah);
+                }
+            } else {
+                printf("Jumlah pengurangan tidak valid.\n");
+            }
+        } else {
+            printf("Pilihan tidak valid.\n");
         }
-        (*keranjangCount)--;
-        printf("Barang berhasil dihapus dari keranjang!\n");
+
+        simpanKeranjangKeFile(keranjang, keranjangCount);
     } else {
         printf("Pilihan tidak valid!\n");
     }

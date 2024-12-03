@@ -40,7 +40,7 @@ void tulisPesanan(Keranjang keranjang[], int keranjangCount, const char *pembeli
 
 void bacaFilePesanan();
 
-void hapusDariKeranjang(Keranjang keranjang[], int *keranjangCount);
+void hapusDariKeranjang(int idLogin);
 
 void simpanPesanan(Keranjang keranjang[], int keranjangCount);
 
