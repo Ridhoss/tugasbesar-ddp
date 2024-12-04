@@ -249,7 +249,7 @@ void deleteProduct(Product *products, int *count, int max_count, int idLogin) {
     }
 }
 
-int bacaProductDariFile(Product product[], int idBarang) {
+int bacaProductDariFile(Product product[]) {
     FILE *file = fopen(file_products, "r");
     if (!file) {
         printf("Product kosong atau file tidak ditemukan.\n");
@@ -262,7 +262,6 @@ int bacaProductDariFile(Product product[], int idBarang) {
     int temp_id, temp_price, temp_stock, temp_id_penjual;
 
     while (fscanf(file, "%d,%49[^,],%29[^,],%d,%d,%d\n", &temp_id, temp_name, temp_category, &temp_price, &temp_stock, &temp_id_penjual) == 6) {
-        if (temp_id == idBarang) {
             product[count].id = temp_id;
             strcpy(product[count].name, temp_name);;
             strcpy(product[count].category, temp_category);;
@@ -270,7 +269,6 @@ int bacaProductDariFile(Product product[], int idBarang) {
             product[count].stock = temp_stock;
             product[count].id_penjual = temp_id_penjual;
             count++;
-        }
     }
     fclose(file);
     return count;

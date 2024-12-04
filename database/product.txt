@@ -1,2 +1,2 @@
-1,laptop,elektronik,20000,3,1
-2,mouse,elektronik,20000,5,1
+1,monitor,elektronik,300000,4,1
+2,mouse,elektronik,20000,1,1

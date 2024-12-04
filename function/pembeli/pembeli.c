@@ -558,17 +558,75 @@ void tulisPesanan(int idLogin) {
         int hargaTotal = keranjang[i].harga * keranjang[i].jumlah;
 
         Product product[100];
-        int productCount = bacaProductDariFile(product, keranjang[i].id_barang);
+        int productCount = bacaProductDariFile(product);
+        int ditemukan = 0;
+        int idPenjual = 0;
 
-        fprintf(file, "%d,%s,%d,%d,%d,%s,", last_id + 1, nomorPesanan, idLogin, product->id_penjual, 0, tanggalPesanan);
+        for (int j = 0; j < productCount; j++) {
+            if (product[j].id == keranjang[i].id_barang) {
+                idPenjual = product[j].id_penjual;
+                ditemukan = 1;
+                break;
+            }
+        }
+
+        if (!ditemukan) {
+            printf("Barang dengan ID %d tidak ditemukan.\n", keranjang[i].id_barang);
+            return;
+        }
+
+        fprintf(file, "%d,%s,%d,%d,%d,%s,", last_id + 1, nomorPesanan, idLogin, idPenjual, 0, tanggalPesanan);
         fprintf(file, "%d,%d,%d,%d,", keranjang[i].id_barang, keranjang[i].jumlah, keranjang[i].harga, hargaTotal);
         fprintf(file, "%s,%s,%s,%s\n", alamat, "GoRisaiz", "Belum Dikonfirmasi", "Belum Dikirim");
+
+        // Kurangi stok produk
+        upStokProduct(keranjang[i].id_barang, keranjang[i].jumlah);
 
         last_id++;
     }
 
     fclose(file);
     printf("Pesanan berhasil disimpan ke file %s.\n", pemesanan);
+}
+
+// mengurangi stock di database product
+void upStokProduct(int idBarang, int jumlah) {
+    Product product[100];
+    int productCount = bacaProductDariFile(product);
+    int ditemukan = 0;
+
+    for (int i = 0; i < productCount; i++) {
+        if (product[i].id == idBarang) {
+            if (product[i].stock >= jumlah) {
+                product[i].stock -= jumlah;
+                ditemukan = 1;
+            } else {
+                printf("Stok tidak mencukupi untuk barang dengan ID %d\n", idBarang);
+                return;
+            }
+        }
+    }
+
+    if (!ditemukan) {
+        printf("Barang dengan ID %d tidak ditemukan.\n", idBarang);
+        return;
+    }
+
+    // Simpan data kembali ke file
+    FILE *file = fopen(file_products, "w");
+    if (file == NULL) {
+        perror("Gagal membuka file produk untuk diperbarui");
+        return;
+    }
+
+    for (int i = 0; i < productCount; i++) {
+        fprintf(file, "%d,%s,%s,%d,%d,%d\n", 
+                product[i].id, product[i].name, product[i].category, 
+                product[i].price, product[i].stock, product[i].id_penjual);
+    }
+
+    fclose(file);
+    printf("Stok untuk barang dengan ID %d berhasil diperbarui.\n", idBarang);
 }
 
 

@@ -38,6 +38,8 @@ void checkout(int idLogin);
 
 void tulisPesanan(int idLogin);
 
+void upStokProduct(int idBarang, int jumlah);
+
 void bacaFilePesanan();
 
 void hapusDariKeranjang(int idLogin);
