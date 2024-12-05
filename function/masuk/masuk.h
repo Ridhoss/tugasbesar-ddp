@@ -2,7 +2,7 @@
 #define MASUK_H
 
 // Record akun
-struct Akun {
+typedef struct {
     int id;
     char username[50];
     char password[50];
@@ -11,10 +11,10 @@ struct Akun {
     char store_name[50];
     int rekening;
     int role;
-};
+} Akun;
 
 //* Baca file akun
-int BacaFileAkun(struct Akun *akun);
+int BacaFileAkun(Akun *akun);
 //* Procedure daftar user
 void DaftarAkun(int role);
 //* Procedure login

@@ -17,10 +17,10 @@ typedef struct {
     int total;
     char expedisi[20];
     char alamat[50];
-    char metode_pengiriman[20];
     char status_pembayaran[20]; // 0 = Belum Dikonfirmasi, 1 = Dikonfirmasi
-    char status_pesanan[20];
     char status_pengiriman[20];
+    char metode_pengiriman[20];
+    char status_pesanan[20];
 } Pesanan;
 
 #endif

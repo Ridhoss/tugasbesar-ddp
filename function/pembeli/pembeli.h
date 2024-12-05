@@ -48,4 +48,6 @@ void konfirmasiPesanan(int *statusPesanan);
 
 void statusPengiriman(int *pengiriman);
 
+void tampilkanPesananUser(int idLogin);
+
 #endif

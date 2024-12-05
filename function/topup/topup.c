@@ -61,7 +61,7 @@ int HanyaTampilkanSaldo(int idLogin) {
 
 // Fungsi untuk memperbarui saldo pengguna di file
 void UpdateSaldo(int idLogin, int tambahanSaldo) {
-    struct Akun akun[100];
+    Akun akun[100];
     int totalAkun = BacaFileAkun(akun);
 
     // Update saldo pada akun yang sesuai

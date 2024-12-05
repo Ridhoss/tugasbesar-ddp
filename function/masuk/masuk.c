@@ -7,7 +7,7 @@ const char *users = "database/users.txt";
 
 
 //* Baca file akun
-int BacaFileAkun(struct Akun *akun) {
+int BacaFileAkun(Akun *akun) {
     FILE *file = fopen(users, "r");
     if (file == NULL) return 0;
 
@@ -141,7 +141,7 @@ void DaftarAkun(int role) {
 void Login(int *loggedIn, int *idLogin) {
     char username[50];
     char password[50];
-    struct Akun akun[100];
+    Akun akun[100];
     int total_akun = BacaFileAkun(akun);
 
     printf("=======================\n");
@@ -227,7 +227,7 @@ void Masuk(int *loggedIn, int *idLogin) {
 
 // Procedure CariAkun
 void CariAkun(int idLogin, char *username, char *password, char *phone, char *alamat, int *rekening, int *role, char *store_name) {
-    struct Akun akun[100];
+    Akun akun[100];
     int totalAkun;
 
     totalAkun = BacaFileAkun(akun);

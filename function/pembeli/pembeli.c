@@ -29,7 +29,7 @@ void halamanUser(int *loggedIn, int idLogin) {
 
     int pilihanMenu;
     do {
-        printf("\n============================\n");
+        printf("==============================\n");
         printf("    Selamat Datang %s\n", username);
         printf("==============================\n");
         printf("1. Lihat Katalog Produk\n");
@@ -87,12 +87,8 @@ void halamanUser(int *loggedIn, int idLogin) {
                 break;
             }
             case 3: {
-                if (statusPesanan) {
-                    printf("Pesanan Anda sedang diproses.\n");
-                    // bacaFilePesanan();
-                } else {
-                    printf("Belum ada pesanan.\n");
-                }
+                tampilkanPesananUser(idLogin);
+
                 break;
             }
             case 4:
@@ -218,6 +214,7 @@ void tampilkanKatalog(Product products[], int jumlahProduk, int idLogin) {
     for (int i = 0; i < jumlahProduk; i++) {
         int stokAsli = products[i].stock;
         int stokTerpakai = 0;
+        char temp_namaToko[50];
 
         // Hitung jumlah barang yang sudah ada di keranjang
         for (int j = 0; j < keranjangCount; j++) {
@@ -225,6 +222,17 @@ void tampilkanKatalog(Product products[], int jumlahProduk, int idLogin) {
                 stokTerpakai += keranjang[j].jumlah;
             }
         }
+
+        Akun akun[100];
+        int totalAkun = BacaFileAkun(akun);
+
+        for (int h = 0; h < totalAkun ; h++) {
+            if (akun[h].id == products[i].id_penjual)
+            {
+                strcpy(temp_namaToko, akun[h].store_name);
+            }
+        }
+
 
         // Hitung stok tersedia
         int stokTersedia = stokAsli - stokTerpakai;
@@ -238,7 +246,7 @@ void tampilkanKatalog(Product products[], int jumlahProduk, int idLogin) {
         printf("Kategori: %s\n", products[i].category);
         printf("Harga: Rp.%s\n", hargaFormatted);
         printf("Stok: %d\n", stokTersedia >= 0 ? stokTersedia : 0); // Hindari stok negatif
-        printf("Toko: %d\n", products[i].id_penjual);
+        printf("Toko: %s\n", temp_namaToko);
         printf("----------------------------\n");
     }
 }
@@ -361,7 +369,7 @@ void tampilkanKeranjangDariFile(int idLogin) {
     Keranjang keranjang[100];
     int keranjangCount = bacaKeranjangDariFile(keranjang, idLogin);
 
-    printf("\n============================\n");
+    printf("============================\n");
     printf("         KERANJANG\n");
     printf("============================\n");
 
@@ -752,42 +760,61 @@ void simpanPesanan(Keranjang keranjang[], int keranjangCount) {
     printf("Pesanan berhasil disimpan ke file %s.\n", file_pemesanan);
 }
 
-// Fungsi untuk membaca file pesanan
-// int bacaFilePesanan(int idLogin, Pesanan pesanan[]) {
-//     FILE *file = fopen(file_pemesanan, "r");
-//     if (file == NULL) {
-//         printf("File %s tidak ditemukan!\n", file_pemesanan);
-//         return 0;
-//     }
+void tampilkanPesananUser(int idLogin) {
+    printf("==============================\n");
+    printf("         DAFTAR PESANAN\n");
+    printf("==============================\n");
 
-//     int temp_id, temp_id_pembeli, temp_id_penjual, temp_id_kurir, temp_id_barang, temp_jumlah, temp_harga, temp_total;
-//     char temp_nomorPesanan[50];
-//     char temp_tanggalPesanan[50];
-//     char temp_alamat[50];
-//     char temp_expedisi[50];
-//     char temp_status_pembayaran[50];
-//     char temp_status_pengiriman[50];
-//     int count = 0;
+    Pesanan pesanan[100];
+    int pesananCount = bacaFilePesanan(pesanan);
+    int pesCount = 0;
 
-//     while (fscanf(file, "%d,%49[^,],%d,%d,%d,%49[^,],%d,%d,%d,%d,%49[^,],%49[^,],%49[^,],%49[^,]\n", &temp_id, temp_nomorPesanan, &temp_id_pembeli, &temp_id_penjual, &temp_id_kurir, temp_tanggalPesanan, &temp_id_barang, &temp_jumlah, &temp_harga, &temp_total, temp_alamat, temp_expedisi, temp_status_pembayaran, temp_status_pengiriman) == 14) {
-//             pesanan[count].id_pesanan = temp_id;
-//             strcpy(pesanan[count].nomorPesanan, temp_nomorPesanan);
-//             pesanan[count].id_pembeli = temp_id_pembeli;
-//             pesanan[count].id_penjual = temp_id_penjual;
-//             strcpy(pesanan[count].tanggalPesanan, temp_tanggalPesanan);
-//             pesanan[count].id_barang = temp_id_barang;
-//             pesanan[count].jumlah = temp_jumlah;
-//             pesanan[count].harga = temp_harga;
-//             pesanan[count].total = temp_total;
-//             strcpy(pesanan[count].alamat, temp_alamat);
-//             strcpy(pesanan[count].expedisi, temp_expedisi);
-//             strcpy(pesanan[count].status_pembayaran, temp_status_pembayaran);
-//             strcpy(pesanan[count].status_pengiriman, temp_status_pengiriman);
+    for (int i = 0; i < pesananCount; i++) {
+        if(pesanan[i].id_pembeli == idLogin){
 
-//             count++;
-//     }
+            Akun akun[100];
+            int totalAkun = BacaFileAkun(akun);
+            char temp_namaToko[50];
 
-//     fclose(file);
+            for (int j = 0; j < totalAkun ; j++) {
+                if (akun[j].id == pesanan[i].id_penjual)
+                {
+                    strcpy(temp_namaToko, akun[j].store_name);
+                }
+            }
 
-//     return count;
-// }
+            Product products[100];
+            int totalProduct = bacaProductDariFile(products);
+            char temp_namaProduct[50];
+
+            for (int g = 0; g < totalAkun ; g++) {
+                if (products[g].id == pesanan[i].id_barang)
+                {
+                    strcpy(temp_namaProduct, products[g].name);
+                }
+            }
+
+            // Menampilkan data pesanan
+            printf("Barang %d:\n", i + 1);
+            printf("  Nomor Pesanan     : %s\n", pesanan[i].nomorPesanan);
+            printf("  Nama Barang       : %s\n", temp_namaProduct);
+            printf("  Jumlah            : %d\n", pesanan[i].jumlah);
+            printf("  Harga Satuan      : Rp.%d\n", pesanan[i].harga);
+            printf("  Total Harga       : Rp.%d\n", pesanan[i].total);
+            printf("  Nama Toko         : %s\n", temp_namaToko);
+            printf("  Expedisi          : %s\n", pesanan[i].expedisi);
+            printf("  Status Pembayaran : %s\n", pesanan[i].status_pembayaran);
+            printf("  Status Pengiriman : %s\n", pesanan[i].status_pengiriman);
+            printf("----------------------------\n");
+
+            pesCount ++;
+        }
+    }
+
+    if (pesCount == 0) {
+        printf("Tidak Ada Pesanan!\n");
+        printf("==============================\n");
+        return;
+    }
+
+}
