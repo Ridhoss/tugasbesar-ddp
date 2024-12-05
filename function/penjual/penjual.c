@@ -259,84 +259,86 @@ void deleteProduct(Product *products, int *count, int max_count, int idLogin) {
 
 
 void listPesanan(Pesanan pesanan[], int idLogin) {
-    // int found = 0;
-    // // int count = bacaFilePesanan(idLogin, pesanan);  //! masih ngirim idLogin
-    //  if (count == 0) {
-    //     printf("Pesanan belum tersedia atau semua pesanan sudah dikonfirmasi.\n");
-    //     return;
-    // }
+    int found = 0;
+    int count = bacaFilePesanan(pesanan); // Memanggil fungsi bacaFilePesanan
+    
+    // Jika tidak ada data pesanan
+    if (count == 0) {
+        printf("Pesanan belum tersedia atau semua pesanan sudah dikonfirmasi.\n");
+        return;
+    }
 
-    // printf("\n--- Daftar Pesanan ---\n");
+    printf("\n--- Daftar Pesanan ---\n");
 
-    // // Menampilkan pesanan yang belum terkonfirmasi
-    // for (int i = 0; i < count; i++) {
-    //     printf("ID Pesanan: %d, Nomor: %s, Pembeli ID: %d, Barang ID: %d, Jumlah: %d, Total: %d, Status Pembayaran: %s\n",
-    //            pesanan[i].id_pesanan, pesanan[i].nomorPesanan, pesanan[i].id_pembeli,
-    //            pesanan[i].id_barang, pesanan[i].jumlah, pesanan[i].total, pesanan[i].status_pembayaran);
-    // }
+    // Menampilkan semua pesanan yang belum terkonfirmasi
+    for (int i = 0; i < count; i++) {
+        printf("ID Pesanan: %d, Nomor: %s, Pembeli ID: %d, Barang ID: %d, Jumlah: %d, Total: %d, Status Pembayaran: %s\n",
+               pesanan[i].id_pesanan, pesanan[i].nomorPesanan, pesanan[i].id_pembeli,
+               pesanan[i].id_barang, pesanan[i].jumlah, pesanan[i].total, pesanan[i].status_pembayaran);
+    }
 
-    // // Memilih pesanan untuk dikonfirmasi
-    // int konfirmasiID;
-    // printf("\nMasukkan ID Pesanan yang ingin dikonfirmasi pembayarannya: ");
-    // scanf("%d", &konfirmasiID);
+    // Memilih pesanan untuk dikonfirmasi
+    int konfirmasiID;
+    printf("\nMasukkan ID Pesanan yang ingin dikonfirmasi pembayarannya: ");
+    scanf("%d", &konfirmasiID);
 
-    // int pesananDikonfirmasi = 0;
-    // for (int i = 0; i < count; i++) {
-    //     if (pesanan[i].id_pesanan == konfirmasiID) {
-    //         // Update status pembayaran
-    //         strcpy(pesanan[i].status_pembayaran, "Terkonfirmasi");
+    int pesananDikonfirmasi = 0;
+    for (int i = 0; i < count; i++) {
+        if (pesanan[i].id_pesanan == konfirmasiID) {
+            // Update status pembayaran
+            strcpy(pesanan[i].status_pembayaran, "Terkonfirmasi");
 
-    //         // Menyimpan perubahan status pembayaran langsung ke file
-    //         FILE *pemesananFile = fopen("database/pemesanan.txt", "r+");
-    //         if (pemesananFile == NULL) {
-    //             printf("Gagal membuka file pemesanan.txt untuk update.\n");
-    //             return;
-    //         }
+            // Menyimpan perubahan status pembayaran ke file
+            FILE *pemesananFile = fopen("database/pemesanan.txt", "r+");
+            if (pemesananFile == NULL) {
+                printf("Gagal membuka file pemesanan.txt untuk update.\n");
+                return;
+            }
 
-    //         // Temp file untuk menyimpan perubahan
-    //         FILE *tempFile = fopen("database/temp.txt", "w");
-    //         if (tempFile == NULL) {
-    //             printf("Gagal membuat file sementara.\n");
-    //             fclose(pemesananFile);
-    //             return;
-    //         }
+            // Temp file untuk menyimpan perubahan
+            FILE *tempFile = fopen("database/temp.txt", "w");
+            if (tempFile == NULL) {
+                printf("Gagal membuat file sementara.\n");
+                fclose(pemesananFile);
+                return;
+            }
 
-    //         char line[1024];
-    //         while (fgets(line, sizeof(line), pemesananFile)) {
-    //             int id_pesanan;
-    //             sscanf(line, "%d", &id_pesanan);
+            char line[1024];
+            while (fgets(line, sizeof(line), pemesananFile)) {
+                int id_pesanan;
+                sscanf(line, "%d", &id_pesanan);
 
-    //             // Mencocokkan ID pesanan dan mengubah status
-    //             if (id_pesanan == pesanan[i].id_pesanan) {
-    //                 // Format output sesuai dengan struktur data, hanya memperbarui status_pembayaran
-    //                 fprintf(tempFile, "%d,%s,%d,%d,%d,%s,%d,%d,%d,%d,%s,%s,%s,%s\n",
-    //                         pesanan[i].id_pesanan, pesanan[i].nomorPesanan, pesanan[i].id_pembeli,
-    //                         pesanan[i].id_penjual, pesanan[i].id_kurir, pesanan[i].tanggalPesanan,
-    //                         pesanan[i].id_barang, pesanan[i].jumlah, pesanan[i].harga,
-    //                         pesanan[i].total, pesanan[i].alamat, pesanan[i].expedisi,
-    //                         pesanan[i].status_pembayaran, pesanan[i].status_pengiriman); // Status pembayaran diperbarui
-    //             } else {
-    //                 fputs(line, tempFile);  // Menyalin baris lainnya tanpa perubahan
-    //             }
-    //         }
+                // Mencocokkan ID pesanan dan mengubah status
+                if (id_pesanan == pesanan[i].id_pesanan) {
+                    fprintf(tempFile, "%d,%s,%d,%d,%d,%s,%d,%d,%d,%d,%s,%s,%s,%s\n",
+                            pesanan[i].id_pesanan, pesanan[i].nomorPesanan, pesanan[i].id_pembeli,
+                            pesanan[i].id_penjual, pesanan[i].id_kurir, pesanan[i].tanggalPesanan,
+                            pesanan[i].id_barang, pesanan[i].jumlah, pesanan[i].harga,
+                            pesanan[i].total, pesanan[i].alamat, pesanan[i].expedisi,
+                            pesanan[i].status_pembayaran, pesanan[i].status_pengiriman);
+                } else {
+                    fputs(line, tempFile); // Salin baris lainnya
+                }
+            }
 
-    //         fclose(pemesananFile);
-    //         fclose(tempFile);
+            fclose(pemesananFile);
+            fclose(tempFile);
 
-    //         // Ganti file asli dengan file sementara
-    //         remove("database/pemesanan.txt");
-    //         rename("database/temp.txt", "database/pemesanan.txt");
+            // Ganti file asli dengan file sementara
+            remove("database/pemesanan.txt");
+            rename("database/temp.txt", "database/pemesanan.txt");
 
-    //         printf("Pesanan dengan ID %d berhasil dikonfirmasi dan diperbarui.\n", konfirmasiID);
-    //         pesananDikonfirmasi = 1;
-    //         break;
-    //     }
-    // }
+            printf("Pesanan dengan ID %d berhasil dikonfirmasi dan diperbarui.\n", konfirmasiID);
+            pesananDikonfirmasi = 1;
+            break;
+        }
+    }
 
-    // if (!pesananDikonfirmasi) {
-    //     printf("Pesanan dengan ID %d tidak ditemukan atau tidak valid untuk dikonfirmasi.\n", konfirmasiID);
-    // }
+    if (!pesananDikonfirmasi) {
+        printf("Pesanan dengan ID %d tidak ditemukan atau tidak valid untuk dikonfirmasi.\n", konfirmasiID);
+    }
 }
+
 
 int bacaProductDariFile(Product product[]) {
     FILE *file = fopen(file_products, "r");
@@ -370,31 +372,25 @@ int bacaFilePesanan(Pesanan pesanan[]) {
         return 0;
     }
 
-    int temp_id, temp_id_pembeli, temp_id_penjual, temp_id_kurir, temp_id_barang, temp_jumlah, temp_harga, temp_total;
-    char temp_nomorPesanan[50];
-    char temp_tanggalPesanan[50];
-    char temp_alamat[50];
-    char temp_expedisi[50];
-    char temp_status_pembayaran[50];
-    char temp_status_pengiriman[50];
     int count = 0;
+    while (!feof(file)) {
+        Pesanan tempPesanan;
 
-    while (fscanf(file, "%d,%49[^,],%d,%d,%d,%49[^,],%d,%d,%d,%d,%49[^,],%49[^,],%49[^,],%49[^,]\n", &temp_id, temp_nomorPesanan, &temp_id_pembeli, &temp_id_penjual, &temp_id_kurir, temp_tanggalPesanan, &temp_id_barang, &temp_jumlah, &temp_harga, &temp_total, temp_alamat, temp_expedisi, temp_status_pembayaran, temp_status_pengiriman) == 14) {
-            pesanan[count].id_pesanan = temp_id;
-            strcpy(pesanan[count].nomorPesanan, temp_nomorPesanan);
-            pesanan[count].id_pembeli = temp_id_pembeli;
-            pesanan[count].id_penjual = temp_id_penjual;
-            strcpy(pesanan[count].tanggalPesanan, temp_tanggalPesanan);
-            pesanan[count].id_barang = temp_id_barang;
-            pesanan[count].jumlah = temp_jumlah;
-            pesanan[count].harga = temp_harga;
-            pesanan[count].total = temp_total;
-            strcpy(pesanan[count].alamat, temp_alamat);
-            strcpy(pesanan[count].expedisi, temp_expedisi);
-            strcpy(pesanan[count].status_pembayaran, temp_status_pembayaran);
-            strcpy(pesanan[count].status_pengiriman, temp_status_pengiriman);
+        // Membaca satu baris data dari file
+        int itemsRead = fscanf(file, "%d,%49[^,],%d,%d,%d,%49[^,],%d,%d,%d,%d,%49[^,],%49[^,],%49[^,],%49[^\n]\n",
+                               &tempPesanan.id_pesanan, tempPesanan.nomorPesanan, &tempPesanan.id_pembeli,
+                               &tempPesanan.id_penjual, &tempPesanan.id_kurir, tempPesanan.tanggalPesanan,
+                               &tempPesanan.id_barang, &tempPesanan.jumlah, &tempPesanan.harga,
+                               &tempPesanan.total, tempPesanan.alamat, tempPesanan.expedisi,
+                               tempPesanan.status_pembayaran, tempPesanan.status_pengiriman);
 
+        // Pastikan semua kolom berhasil terbaca
+        if (itemsRead == 14) {
+            pesanan[count] = tempPesanan; // Menyimpan data ke array
             count++;
+        } else if (itemsRead > 0) {
+            printf("Data tidak lengkap ditemukan di file, baris dilewati.\n");
+        }
     }
 
     fclose(file);
