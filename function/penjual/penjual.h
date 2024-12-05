@@ -41,6 +41,6 @@ void listPesanan(Pesanan pesanan[], int idLogin);
 
 int bacaProductDariFile(Product product[]);
 
-int bacaFilePesanan(int idLogin, Pesanan pesanan[]);
+int bacaFilePesanan(Pesanan pesanan[]);
 
 #endif

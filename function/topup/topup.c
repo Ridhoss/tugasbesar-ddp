@@ -3,7 +3,9 @@
 #include <string.h>
 #include "topup.h"
 #include "../masuk/masuk.h"
-#include "../pembeli/pembeli.h"
+#include "../penjual/penjual.h"
+#include "../pesanan/pesanan.h"
+
 
 void CekRekening(int idLogin) {
     char username[50], password[50], phone[16], alamat[50], store_name[50];
@@ -39,7 +41,7 @@ int HanyaTampilkanSaldo(int idLogin) {
     CariAkun(idLogin, username, password, phone, alamat, &rekening, &role, store_name);
 
     Pesanan pesanan[100];
-    int pesananCount = bacaFilePesanan(idLogin, pesanan);
+    int pesananCount = bacaFilePesanan(pesanan);
     int totalHargaPesanan = 0;
 
     for (int i = 0; i < pesananCount; i++) {
