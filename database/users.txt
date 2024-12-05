@@ -1,5 +1,5 @@
 1,sachin,123,08695,bandung,0,2,sachinstore
-2,ridhoss,123,089495,cimahi,60000,1,null
+2,ridhoss,123,089495,cimahi,10060000,1,null
 3,dori,123,08950,bandung,0,2,doristore
 4,ridhosss,123,0949,cimahi,0,1,null
 5,idoz,123,08219328,jl. abc,0,2,idozzz
