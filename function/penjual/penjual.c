@@ -263,8 +263,8 @@ int bacaProductDariFile(Product product[]) {
 
     while (fscanf(file, "%d,%49[^,],%29[^,],%d,%d,%d\n", &temp_id, temp_name, temp_category, &temp_price, &temp_stock, &temp_id_penjual) == 6) {
             product[count].id = temp_id;
-            strcpy(product[count].name, temp_name);;
-            strcpy(product[count].category, temp_category);;
+            strcpy(product[count].name, temp_name);
+            strcpy(product[count].category, temp_category);
             product[count].price = temp_price;
             product[count].stock = temp_stock;
             product[count].id_penjual = temp_id_penjual;

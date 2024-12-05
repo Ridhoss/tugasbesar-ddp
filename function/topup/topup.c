@@ -3,18 +3,15 @@
 #include <string.h>
 #include "topup.h"
 #include "../masuk/masuk.h"
+#include "../pembeli/pembeli.h"
 
 void CekRekening(int idLogin) {
     char username[50], password[50], phone[16], alamat[50], store_name[50];
     int rekening, role;
-
     CariAkun(idLogin, username, password, phone, alamat, &rekening, &role, store_name);
-
     int pilih = 0;
 
-    printf("===========================\n");
-    printf("Saldo Rekening Anda = %d\n", rekening);
-    printf("===========================\n");
+    int saldo = HanyaTampilkanSaldo(idLogin);
 
     for (;;) {
         printf("1. Topup Rekening\n");
@@ -41,10 +38,22 @@ int HanyaTampilkanSaldo(int idLogin) {
 
     CariAkun(idLogin, username, password, phone, alamat, &rekening, &role, store_name);
 
-    printf("===========================\n");
-    printf("Saldo Rekening Anda = Rp.%d\n", rekening);
+    Pesanan pesanan[100];
+    int pesananCount = bacaFilePesanan(idLogin, pesanan);
+    int totalHargaPesanan = 0;
 
-    return rekening;
+    for (int i = 0; i < pesananCount; i++) {
+        if (pesanan[i].id_pembeli == idLogin) {
+            totalHargaPesanan += pesanan[i].harga;
+        }
+    }
+
+    int totalSaldo = rekening - totalHargaPesanan;
+
+    printf("===========================\n");
+    printf("Saldo Rekening Anda = Rp.%d\n", totalSaldo);
+
+    return totalSaldo;
 }
 
 
