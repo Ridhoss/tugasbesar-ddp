@@ -37,7 +37,7 @@ void deleteProduct(Product *products, int *count, int max_count, int idLogin);
 void viewProduct(Product *products, int count, int idLogin);
 
 // Menampilkan pesanan
-void listPesanan(Pesanan pesanan[], int count, int idLogin);
+void listPesanan(Pesanan pesanan[], int idLogin);
 
 int bacaProductDariFile(Product product[]);
 
