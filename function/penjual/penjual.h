@@ -1,6 +1,8 @@
 #ifndef PENJUAL_H
 #define PENJUAL_H
 
+#include "../pesanan/pesanan.h"
+
 typedef struct {
     int id;
     char name[50];
@@ -34,6 +36,11 @@ void deleteProduct(Product *products, int *count, int max_count, int idLogin);
 // Menampilkan produk milik toko tertentu
 void viewProduct(Product *products, int count, int idLogin);
 
+// Menampilkan pesanan
+void listPesanan(Pesanan pesanan[], int count, int idLogin);
+
 int bacaProductDariFile(Product product[]);
+
+int bacaFilePesanan(int idLogin, Pesanan pesanan[]);
 
 #endif

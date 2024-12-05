@@ -12,22 +12,6 @@ typedef struct {
     int id_pembeli;
 } Keranjang;
 
-typedef struct {
-    int id_pesanan;
-    char nomorPesanan[50];
-    int id_pembeli;
-    int id_penjual;
-    int id_kurir;
-    char tanggalPesanan[50];
-    int id_barang;
-    int jumlah;
-    int harga;
-    int total;
-    char alamat[50];
-    char expedisi[50];
-    char status_pembayaran[50];
-    char status_pengiriman[50];
-} Pesanan;
 
 extern const char *file_products;
 

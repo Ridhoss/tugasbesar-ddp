@@ -2,12 +2,12 @@
 #include "../penjual/penjual.h"
 #include "../masuk/masuk.h"
 #include "../topup/topup.h"
+#include "../pesanan/pesanan.h"
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
 
 // Deklarasi global
-const char *file_pemesanan = "database/pemesanan.txt";
 const char *keranjang_file = "database/keranjang.txt";
 
 void halamanUser(int *loggedIn, int idLogin) {
@@ -486,7 +486,7 @@ void tulisPesanan(int idLogin) {
         return;
     }
 
-    int last_id = 0; 
+    int last_id = 0;
 
     // Cari id_pesanan terakhir
     FILE *cekpes = fopen(file_pemesanan, "r");
@@ -507,8 +507,8 @@ void tulisPesanan(int idLogin) {
     time_t t = time(NULL);
     struct tm *waktu = localtime(&t);
 
-    snprintf(tanggalPesanan, sizeof(tanggalPesanan), "%02d%02d%02d", 
-            waktu->tm_mday, waktu->tm_mon + 1, (waktu->tm_year + 1900) % 100);
+    snprintf(tanggalPesanan, sizeof(tanggalPesanan), "%02d%02d%02d",
+             waktu->tm_mday, waktu->tm_mon + 1, (waktu->tm_year + 1900) % 100);
 
     // Cek increment terakhir untuk nomor pesanan
     int increment = 1;
@@ -538,10 +538,11 @@ void tulisPesanan(int idLogin) {
     char nomorPesanan[20];
     snprintf(nomorPesanan, sizeof(nomorPesanan), "%s%02d", tanggalPesanan, increment);
 
-    // Simpan pesanan ke dalam file
-    for (int i = 0; i < keranjangCount; i++) {
-        int hargaTotal = keranjang[i].harga * keranjang[i].jumlah;
+    Pesanan pesanan[100]; // Menggunakan struct Pesanan
+    int pesananCount = 0;
 
+    // Simpan pesanan ke dalam struct sebelum menulis ke file
+    for (int i = 0; i < keranjangCount; i++) {
         Product product[100];
         int productCount = bacaProductDariFile(product);
         int ditemukan = 0;
@@ -560,19 +561,50 @@ void tulisPesanan(int idLogin) {
             return;
         }
 
-        fprintf(file, "%d,%s,%d,%d,%d,%s,", last_id + 1, nomorPesanan, idLogin, idPenjual, 0, tanggalPesanan);
-        fprintf(file, "%d,%d,%d,%d,", keranjang[i].id_barang, keranjang[i].jumlah, keranjang[i].harga, hargaTotal);
-        fprintf(file, "%s,%s,%s,%s\n", alamat, "GoRisaiz", "Belum Dikonfirmasi", "Belum Dikirim");
+        pesanan[pesananCount].id_pesanan = ++last_id;
+        strcpy(pesanan[pesananCount].nomorPesanan, nomorPesanan);
+        pesanan[pesananCount].id_pembeli = idLogin;
+        pesanan[pesananCount].id_penjual = idPenjual;
+        pesanan[pesananCount].id_kurir = 0; // Default
+        strcpy(pesanan[pesananCount].tanggalPesanan, tanggalPesanan);
+        pesanan[pesananCount].id_barang = keranjang[i].id_barang;
+        pesanan[pesananCount].jumlah = keranjang[i].jumlah;
+        pesanan[pesananCount].harga = keranjang[i].harga;
+        pesanan[pesananCount].total = keranjang[i].harga * keranjang[i].jumlah;
+        strcpy(pesanan[pesananCount].alamat, alamat);
+        strcpy(pesanan[pesananCount].expedisi, "GoRisaiz");
+        strcpy(pesanan[pesananCount].status_pembayaran, "Belum Dikonfirmasi");
+        strcpy(pesanan[pesananCount].status_pengiriman, "Belum Dikirim");
+
+        pesananCount++;
 
         // Kurangi stok produk
         upStokProduct(keranjang[i].id_barang, keranjang[i].jumlah);
+    }
 
-        last_id++;
+    // Tulis data pesanan dari struct ke file
+    for (int i = 0; i < pesananCount; i++) {
+        fprintf(file, "%d,%s,%d,%d,%d,%s,%d,%d,%d,%d,%s,%s,%s,%s\n",
+                pesanan[i].id_pesanan,
+                pesanan[i].nomorPesanan,
+                pesanan[i].id_pembeli,
+                pesanan[i].id_penjual,
+                pesanan[i].id_kurir,
+                pesanan[i].tanggalPesanan,
+                pesanan[i].id_barang,
+                pesanan[i].jumlah,
+                pesanan[i].harga,
+                pesanan[i].total,
+                pesanan[i].alamat,
+                pesanan[i].expedisi,
+                pesanan[i].status_pembayaran,
+                pesanan[i].status_pengiriman);
     }
 
     fclose(file);
     printf("Pesanan berhasil disimpan ke file %s.\n", file_pemesanan);
 }
+
 
 // mengurangi stock di database product
 // ridho
@@ -721,41 +753,41 @@ void simpanPesanan(Keranjang keranjang[], int keranjangCount) {
 }
 
 // Fungsi untuk membaca file pesanan
-int bacaFilePesanan(int idLogin, Pesanan pesanan[]) {
-    FILE *file = fopen(file_pemesanan, "r");
-    if (file == NULL) {
-        printf("File %s tidak ditemukan!\n", file_pemesanan);
-        return 0;
-    }
+// int bacaFilePesanan(int idLogin, Pesanan pesanan[]) {
+//     FILE *file = fopen(file_pemesanan, "r");
+//     if (file == NULL) {
+//         printf("File %s tidak ditemukan!\n", file_pemesanan);
+//         return 0;
+//     }
 
-    int temp_id, temp_id_pembeli, temp_id_penjual, temp_id_kurir, temp_id_barang, temp_jumlah, temp_harga, temp_total;
-    char temp_nomorPesanan[50];
-    char temp_tanggalPesanan[50];
-    char temp_alamat[50];
-    char temp_expedisi[50];
-    char temp_status_pembayaran[50];
-    char temp_status_pengiriman[50];
-    int count = 0;
+//     int temp_id, temp_id_pembeli, temp_id_penjual, temp_id_kurir, temp_id_barang, temp_jumlah, temp_harga, temp_total;
+//     char temp_nomorPesanan[50];
+//     char temp_tanggalPesanan[50];
+//     char temp_alamat[50];
+//     char temp_expedisi[50];
+//     char temp_status_pembayaran[50];
+//     char temp_status_pengiriman[50];
+//     int count = 0;
 
-    while (fscanf(file, "%d,%49[^,],%d,%d,%d,%49[^,],%d,%d,%d,%d,%49[^,],%49[^,],%49[^,],%49[^,]\n", &temp_id, temp_nomorPesanan, &temp_id_pembeli, &temp_id_penjual, &temp_id_kurir, temp_tanggalPesanan, &temp_id_barang, &temp_jumlah, &temp_harga, &temp_total, temp_alamat, temp_expedisi, temp_status_pembayaran, temp_status_pengiriman) == 14) {
-            pesanan[count].id_pesanan = temp_id;
-            strcpy(pesanan[count].nomorPesanan, temp_nomorPesanan);
-            pesanan[count].id_pembeli = temp_id_pembeli;
-            pesanan[count].id_penjual = temp_id_penjual;
-            strcpy(pesanan[count].tanggalPesanan, temp_tanggalPesanan);
-            pesanan[count].id_barang = temp_id_barang;
-            pesanan[count].jumlah = temp_jumlah;
-            pesanan[count].harga = temp_harga;
-            pesanan[count].total = temp_total;
-            strcpy(pesanan[count].alamat, temp_alamat);
-            strcpy(pesanan[count].expedisi, temp_expedisi);
-            strcpy(pesanan[count].status_pembayaran, temp_status_pembayaran);
-            strcpy(pesanan[count].status_pengiriman, temp_status_pengiriman);
+//     while (fscanf(file, "%d,%49[^,],%d,%d,%d,%49[^,],%d,%d,%d,%d,%49[^,],%49[^,],%49[^,],%49[^,]\n", &temp_id, temp_nomorPesanan, &temp_id_pembeli, &temp_id_penjual, &temp_id_kurir, temp_tanggalPesanan, &temp_id_barang, &temp_jumlah, &temp_harga, &temp_total, temp_alamat, temp_expedisi, temp_status_pembayaran, temp_status_pengiriman) == 14) {
+//             pesanan[count].id_pesanan = temp_id;
+//             strcpy(pesanan[count].nomorPesanan, temp_nomorPesanan);
+//             pesanan[count].id_pembeli = temp_id_pembeli;
+//             pesanan[count].id_penjual = temp_id_penjual;
+//             strcpy(pesanan[count].tanggalPesanan, temp_tanggalPesanan);
+//             pesanan[count].id_barang = temp_id_barang;
+//             pesanan[count].jumlah = temp_jumlah;
+//             pesanan[count].harga = temp_harga;
+//             pesanan[count].total = temp_total;
+//             strcpy(pesanan[count].alamat, temp_alamat);
+//             strcpy(pesanan[count].expedisi, temp_expedisi);
+//             strcpy(pesanan[count].status_pembayaran, temp_status_pembayaran);
+//             strcpy(pesanan[count].status_pengiriman, temp_status_pengiriman);
 
-            count++;
-    }
+//             count++;
+//     }
 
-    fclose(file);
+//     fclose(file);
 
-    return count;
-}
+//     return count;
+// }
