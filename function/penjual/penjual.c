@@ -5,6 +5,7 @@
 #include "../pesanan/pesanan.h"
 #include "../masuk/masuk.h"
 #include "../topup/topup.h"
+#include "../kurir/kurir.h"
 
 // Deklarasi global
 const char *file_products = "database/product.txt";
@@ -214,7 +215,7 @@ void deleteProduct(Product *products, int *count, int max_count, int idLogin) {
 void listPesanan(Pesanan pesanan[], int idLogin) {
     int found = 0;
     int count = bacaFilePesanan(pesanan);
-    
+
     if (count == 0) {
         printf("Pesanan belum tersedia atau semua pesanan sudah dikonfirmasi.\n");
         return;
@@ -226,7 +227,8 @@ void listPesanan(Pesanan pesanan[], int idLogin) {
     for (int i = 0; i < count; i++) {
         printf("ID Pesanan: %d, Nomor: %s, Pembeli ID: %d, Barang ID: %d, Jumlah: %d, Total: %d, Status Pembayaran: %s, Status Pengiriman: %s\n",
                pesanan[i].id_pesanan, pesanan[i].nomorPesanan, pesanan[i].id_pembeli,
-               pesanan[i].id_barang, pesanan[i].jumlah, pesanan[i].total, pesanan[i].status_pembayaran, pesanan[i].status_pengiriman);
+               pesanan[i].id_barang, pesanan[i].jumlah, pesanan[i].total,
+               pesanan[i].status_pembayaran, pesanan[i].status_pengiriman);
     }
 
     // Memilih pesanan untuk dikonfirmasi
@@ -240,47 +242,17 @@ void listPesanan(Pesanan pesanan[], int idLogin) {
             // Update status pembayaran
             strcpy(pesanan[i].status_pembayaran, "Terkonfirmasi");
 
-            // Menyimpan perubahan status pembayaran ke file
-            FILE *pemesananFile = fopen("database/pemesanan.txt", "r+");
-            if (pemesananFile == NULL) {
-                printf("Gagal membuka file pemesanan.txt untuk update.\n");
-                return;
+            // Assign pesanan ke kurir
+            int idKurir = cariKurir();
+            if (idKurir != -1) {
+                pesanan[i].id_kurir = idKurir;
+                printf("Pesanan berhasil diassign ke kurir dengan ID %d.\n", idKurir);
+            } else {
+                printf("Tidak ada kurir tersedia untuk assign pesanan.\n");
             }
 
-            // Temp file untuk menyimpan perubahan
-            FILE *tempFile = fopen("database/temp.txt", "w");
-            if (tempFile == NULL) {
-                printf("Gagal membuat file sementara.\n");
-                fclose(pemesananFile);
-                return;
-            }
-
-            char line[1024];
-            while (fgets(line, sizeof(line), pemesananFile)) {
-                int id_pesanan;
-                sscanf(line, "%d", &id_pesanan);
-
-                // Mencocokkan ID pesanan dan mengubah status
-                if (id_pesanan == pesanan[i].id_pesanan) {
-                    fprintf(tempFile, "%d,%s,%d,%d,%d,%s,%d,%d,%d,%d,%s,%s,%s,%s\n",
-                            pesanan[i].id_pesanan, pesanan[i].nomorPesanan, pesanan[i].id_pembeli,
-                            pesanan[i].id_penjual, pesanan[i].id_kurir, pesanan[i].tanggalPesanan,
-                            pesanan[i].id_barang, pesanan[i].jumlah, pesanan[i].harga,
-                            pesanan[i].total, pesanan[i].alamat, pesanan[i].expedisi,
-                            pesanan[i].status_pembayaran, pesanan[i].status_pengiriman);
-                } else {
-                    fputs(line, tempFile); // Salin baris lainnya
-                }
-            }
-
-            fclose(pemesananFile);
-            fclose(tempFile);
-
-            // Ganti file asli dengan file sementara
-            remove("database/pemesanan.txt");
-            rename("database/temp.txt", "database/pemesanan.txt");
-
-            printf("Pesanan dengan ID %d berhasil dikonfirmasi dan diperbarui.\n", konfirmasiID);
+            // Menyimpan perubahan ke file
+            simpanFilePesanan(pesanan, count);
             pesananDikonfirmasi = 1;
             break;
         }
@@ -290,6 +262,7 @@ void listPesanan(Pesanan pesanan[], int idLogin) {
         printf("Pesanan dengan ID %d tidak ditemukan atau tidak valid untuk dikonfirmasi.\n", konfirmasiID);
     }
 }
+
 
 int bacaProductDariFile(Product product[]) {
     FILE *file = fopen(file_products, "r");
@@ -346,4 +319,35 @@ int bacaFilePesanan(Pesanan pesanan[]) {
 
     fclose(file);
     return count;
+}
+
+int cariKurir() {
+    FILE *file = fopen("database/users.txt", "r");
+    if (file == NULL) {
+        printf("Gagal membuka file\n");
+        return -1;
+    }
+
+    char line[256];
+    int id, role;
+
+    while (fgets(line, sizeof(line), file)) {
+        // Inisialisasi default
+        id = role = 0;
+
+        printf("Baris sebelum parsing: %s\n", line);
+
+        // Parsing hanya ID dan role
+        int parsed = sscanf(line, "%d,%*[^,],%*[^,],%*[^,],%*[^,],%*[^,],%d,%*[^,]",
+                            &id, &role);
+
+        // Periksa apakah parsing sukses dan role == 3
+        if (parsed == 2 && role == 3) {
+            fclose(file);
+            return id;
+        }
+    }
+
+    fclose(file);
+    return -1; // Tidak ada kurir ditemukan
 }

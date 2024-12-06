@@ -37,4 +37,6 @@ int bacaProductDariFile(Product product[]);
 
 int bacaFilePesanan(Pesanan pesanan[]);
 
+int cariKurir();
+
 #endif
