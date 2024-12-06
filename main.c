@@ -3,6 +3,7 @@
 #include "function/penjual/penjual.h"
 #include "function/masuk/masuk.h"
 #include "function/pembeli/pembeli.h"
+#include "function/kurir/kurir.h"
 
 // Main Program
 int main() {
@@ -25,6 +26,10 @@ int main() {
             }else if (role == 2)
             {
                 halamanAdmin(&loggedIn, idLogin);
+            }
+            else if (role == 3)
+            {
+                halamanKurir(&loggedIn, idLogin);
             }
         } else if(loggedIn == 2){
             Clear(&idLogin, username, password, phone, alamat, &rekening, &role, store_name);
