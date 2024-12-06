@@ -3,3 +3,6 @@
 3,dori,123,08950,bandung,0,2,doristore
 4,ridhosss,123,0949,cimahi,0,1,null
 5,idoz,123,08219328,jl. abc,0,2,idozzz
+6,kurir,123,0812345,jl.abc,0,3,null
+
+7,kurir2,123,081239213,null,0,3,null

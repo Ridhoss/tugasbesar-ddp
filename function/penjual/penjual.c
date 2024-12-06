@@ -14,7 +14,6 @@ void halamanAdmin(int *loggedIn, int idLogin){
     char username[50], password[50], phone[16], alamat[50], store_name[50];
     int rekening, role;
     Pesanan pesanan[100];
-    // int pesananCount = bacaFilePesanan(idLogin, pesanan); //! masih ngirim id login
 
     CariAkun(idLogin, username, password, phone, alamat, &rekening, &role, store_name);
 
@@ -29,11 +28,8 @@ void halamanAdmin(int *loggedIn, int idLogin){
     Product products[MAX_PRODUCTS];
     int count = 0;
 
-    count = loadProducts(products, MAX_PRODUCTS);
-
     int choice;
     do {
-        printf("===========================\n");
         printf("==== Halaman Admin ====\n");
         printf("===========================\n");
         printf("1. Tambah Produk\n");
@@ -114,18 +110,6 @@ void addProduct(Product *products, int *count, int max_count, int idLogin) {
     printf("Produk berhasil ditambahkan dengan ID: %d\n", newProduct.id);
 }
 
-void listProducts(Product *products, int count) {
-    if (count == 0) {
-        printf("Produk Kosong\n");
-        return;
-    }
-    printf("\n--- Daftar Produk ---\n");
-    for (int i = 0; i < count; i++) {
-        printf("ID: %d, Nama: %s, Kategori: %s, Harga: %.2f, Stok: %d\n",
-            products[i].id, products[i].name, products[i].category, products[i].price, products[i].stock);
-    }
-}
-
 void saveProducts(Product *products, int count, int idLogin) {
     FILE *file = fopen(file_products, "w");
     if (!file) {
@@ -143,40 +127,7 @@ void saveProducts(Product *products, int count, int idLogin) {
     printf("Produk berhasil disimpan.\n");
 }
 
-int loadProducts(Product *products, int max_count) {
-    FILE *file = fopen(file_products, "r");
-    if (!file) {
-        printf("Tidak ada data.\n");
-        return 0;
-    }
-
-    int count = 0;
-    printf("Memuat produk...\n");
-
-    while (fscanf(file, "%d,%49[^,],%29[^,],%d,%d,%d\n",
-                  &products[count].id, products[count].name,
-                  products[count].category, &products[count].price,
-                  &products[count].stock, &products[count].id_penjual) == 6) {
-        // Cek duplikasi ID
-        int isDuplicate = 0;
-        for (int i = 0; i < count; i++) {
-            if (products[i].id == products[count].id) {
-                isDuplicate = 1;
-                break;
-            }
-        }
-        if (!isDuplicate) {
-            count++;
-        }
-        if (count >= max_count) break;
-    }
-
-    fclose(file);
-    printf("Memuat %d produk dari file.\n", count);
-    return count;
-}
-
-// Untuk menampilkan produk milik toko tertentu
+// Menampilkan produk milik toko tertentu
 void viewProduct(Product *products, int count, int idLogin) {
     int found = 0;
         printf("\n--- Daftar Produk ---\n");
@@ -195,6 +146,7 @@ void viewProduct(Product *products, int count, int idLogin) {
     }
 }
 
+// Edit Produk
 void editProduct(Product *products, int count, int idLogin) {
     int id;
     printf("Masukkan ID produk yang ingin diedit: ");
@@ -227,6 +179,7 @@ void editProduct(Product *products, int count, int idLogin) {
     }
 }
 
+// Hapus produk
 void deleteProduct(Product *products, int *count, int max_count, int idLogin) {
     int id;
     printf("Masukkan ID produk yang ingin dihapus: ");
@@ -257,12 +210,11 @@ void deleteProduct(Product *products, int *count, int max_count, int idLogin) {
     }
 }
 
-
+// Melihat Pesanan yang pembayarannya belum dikonfirmasi penjual
 void listPesanan(Pesanan pesanan[], int idLogin) {
     int found = 0;
-    int count = bacaFilePesanan(pesanan); // Memanggil fungsi bacaFilePesanan
+    int count = bacaFilePesanan(pesanan);
     
-    // Jika tidak ada data pesanan
     if (count == 0) {
         printf("Pesanan belum tersedia atau semua pesanan sudah dikonfirmasi.\n");
         return;
@@ -272,9 +224,9 @@ void listPesanan(Pesanan pesanan[], int idLogin) {
 
     // Menampilkan semua pesanan yang belum terkonfirmasi
     for (int i = 0; i < count; i++) {
-        printf("ID Pesanan: %d, Nomor: %s, Pembeli ID: %d, Barang ID: %d, Jumlah: %d, Total: %d, Status Pembayaran: %s\n",
+        printf("ID Pesanan: %d, Nomor: %s, Pembeli ID: %d, Barang ID: %d, Jumlah: %d, Total: %d, Status Pembayaran: %s, Status Pengiriman: %s\n",
                pesanan[i].id_pesanan, pesanan[i].nomorPesanan, pesanan[i].id_pembeli,
-               pesanan[i].id_barang, pesanan[i].jumlah, pesanan[i].total, pesanan[i].status_pembayaran);
+               pesanan[i].id_barang, pesanan[i].jumlah, pesanan[i].total, pesanan[i].status_pembayaran, pesanan[i].status_pengiriman);
     }
 
     // Memilih pesanan untuk dikonfirmasi
@@ -338,7 +290,6 @@ void listPesanan(Pesanan pesanan[], int idLogin) {
         printf("Pesanan dengan ID %d tidak ditemukan atau tidak valid untuk dikonfirmasi.\n", konfirmasiID);
     }
 }
-
 
 int bacaProductDariFile(Product product[]) {
     FILE *file = fopen(file_products, "r");

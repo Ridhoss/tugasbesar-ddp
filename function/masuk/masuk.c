@@ -35,7 +35,7 @@ void DaftarAkun(int role) {
     char password[50];
     char password_check[50];
     char phone[14];
-    char alamat[50];
+    char alamat[50] = "null";
     char store_name[50] = "null";
     int last_id = 0;
 
@@ -103,11 +103,14 @@ void DaftarAkun(int role) {
     printf("=======================\n");
     printf("Masukan Nomor Telepon : ");
     scanf("%s", phone);
-    // Membaca alamat
-    printf("Masukan Alamat: ");
-    getchar(); // Hilangkan karakter newline yang tertinggal di buffer
-    fgets(alamat, sizeof(alamat), stdin);
-    alamat[strcspn(alamat, "\n")] = '\0'; // Hapus newline jika ada
+
+    // Meminta alamat hanya jika bukan role 3
+    if (role != 3) {
+        printf("Masukan Alamat: ");
+        getchar();
+        fgets(alamat, sizeof(alamat), stdin);
+        alamat[strcspn(alamat, "\n")] = '\0'; // Hapus newline
+    }
 
     // Membaca nama toko (jika role == 2)
     if (role == 2) {
