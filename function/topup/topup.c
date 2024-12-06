@@ -92,10 +92,12 @@ void TopUp(int idLogin) {
     // Cari data akun
     CariAkun(idLogin, username, password, phone, alamat, &rekening, &role, store_name);
 
+    int saldo_sekarang = HanyaTampilkanSaldo(idLogin);
+
     // Tampilkan informasi pengguna
     printf("=======================\n");
     printf("Username: %s\n", username);
-    printf("Saldo Saat Ini: %d\n", rekening);
+    printf("Saldo Saat Ini: %d\n", saldo_sekarang);
     printf("=======================\n");
 
     // Minta input jumlah top-up

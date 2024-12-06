@@ -1,1 +1,2 @@
 1,05122401,2,1,0,051224,2,2,20000,40000,cimahi,GoRisaiz,Belum Dikonfirmasi,Belum Dikirim
+2,06122401,2,1,0,061224,2,2,20000,40000,cimahi,GoRisaiz,Belum Dikonfirmasi,Belum Dikirim
