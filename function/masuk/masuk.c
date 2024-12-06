@@ -151,7 +151,6 @@ void Login(int *loggedIn, int *idLogin) {
     printf("MASUK\n");
     printf("=======================\n");
 
-    for (;;) {
         printf("Masukan Username: ");
         scanf("%s", username);
         printf("Masukan Password: ");
@@ -168,30 +167,39 @@ void Login(int *loggedIn, int *idLogin) {
         printf("=======================\n");
         printf("Username atau Password salah!\n");   
         printf("=======================\n");
-    }
+    
 }
 
 //* Procedure daftar
 void Daftar() {
     int pilihan;
 
-    printf("=======================\n");
-    printf("=== Daftar ===\n");
-    printf("=======================\n");
-    printf("1. Buat Akun User\n");
-    printf("2. Buat Akun Penjual\n");
-    printf("3. Buat Akun Kurir\n");
-    printf("Pilih : ");
-    scanf("%d", &pilihan);
+    for (;;)
+    {
+        printf("=======================\n");
+        printf("=== Daftar ===\n");
+        printf("=======================\n");
+        printf("1. Buat Akun User\n");
+        printf("2. Buat Akun Penjual\n");
+        printf("3. Buat Akun Kurir\n");
+        printf("4. Kembali\n");
+        printf("Pilih:(1/4) ");
+        scanf("%d", &pilihan);
 
-    if (pilihan == 1) {
-        DaftarAkun(1);
-    }else if(pilihan == 2){
-        DaftarAkun(2);
-    }else if(pilihan == 3) {
-        DaftarAkun(3);
-    }else {
-        printf("Error 404. Input Tidak Diketahui\n");
+        if (pilihan == 1) {
+            DaftarAkun(1);
+            break;
+        }else if(pilihan == 2){
+            DaftarAkun(2);
+            break;
+        }else if(pilihan == 3) {
+            DaftarAkun(3);
+            break;
+        }else if(pilihan == 4) {
+            break;
+        }else {
+            printf("Error 404. Input Tidak Diketahui\n");
+        }
     }
 }
 
@@ -199,12 +207,12 @@ void Daftar() {
 void Masuk(int *loggedIn, int *idLogin) {
     int masuk = 0;
 
-    printf("===========================\n");
-    printf("=== Selamat Datang Di E-Commerce ===\n");
-    printf("===========================\n");
-
     for (;;)
     {
+        printf("===========================\n");
+        printf("=== Selamat Datang Di E-Commerce ===\n");
+        printf("===========================\n");
+
         printf("Apakah Sudah Memiliki Akun?\n");
         printf("1. Masuk\n");
         printf("2. Daftar\n");
@@ -217,8 +225,6 @@ void Masuk(int *loggedIn, int *idLogin) {
             break;
         } else if (masuk == 2) {
             Daftar();
-            Login(loggedIn, idLogin);
-            break;
         } else if (masuk == 3) {   
             *loggedIn = 2;
             break;

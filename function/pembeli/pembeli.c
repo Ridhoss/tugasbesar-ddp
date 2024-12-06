@@ -38,7 +38,7 @@ void halamanUser(int *loggedIn, int idLogin) {
         printf("4. Cek Rekening\n");
         printf("5. Logout\n");
         printf("============================\n");
-        printf("Pilih menu: ");
+        printf("Pilih menu:(1/5) ");
         scanf("%d", &pilihanMenu);
 
         switch (pilihanMenu) {
@@ -53,7 +53,7 @@ void halamanUser(int *loggedIn, int idLogin) {
                     printf("============================\n");
                     printf("1. Beli Barang\n");
                     printf("2. Kembali\n");
-                    printf("Apakah ingin membeli barang = ");
+                    printf("Apakah ingin membeli barang:(1/2) ");
                     scanf("%d", &pilihan);
 
                     if (pilihan == 1)
@@ -72,15 +72,15 @@ void halamanUser(int *loggedIn, int idLogin) {
             case 2: {
                 tampilkanKeranjangDariFile(idLogin);
                 int pilihanKeranjang;
-                printf("1. Kembali\n");
-                printf("2. Checkout\n");
-                printf("3. Hapus Barang dari Keranjang\n");
-                printf("Pilih: ");
+                printf("1. Checkout\n");
+                printf("2. Hapus Barang dari Keranjang\n");
+                printf("3. Kembali\n");
+                printf("Pilih:(1/3) ");
                 scanf("%d", &pilihanKeranjang);
 
-                if (pilihanKeranjang == 2) {
+                if (pilihanKeranjang == 1) {
                         checkout(idLogin);
-                } else if (pilihanKeranjang == 3) {
+                } else if (pilihanKeranjang == 2) {
                     hapusDariKeranjang(idLogin);
                 }
 
@@ -241,7 +241,7 @@ void tampilkanKatalog(Product products[], int jumlahProduk, int idLogin) {
         formatRibuan((int)products[i].price, hargaFormatted);
 
         // Tampilkan informasi produk
-        printf("ID: %d\n", products[i].id);
+        printf("No: %d\n", products[i].id);
         printf("Nama: %s\n", products[i].name);
         printf("Kategori: %s\n", products[i].category);
         printf("Harga: Rp.%s\n", hargaFormatted);
@@ -269,7 +269,6 @@ void simpanKeranjangKeFile(Keranjang keranjang[], int keranjangCount) {
                 keranjang[i].id_pembeli);
     }
     fclose(file);
-    printf("Keranjang berhasil disimpan ke file.\n");
 }
 
 // ridho
@@ -309,7 +308,9 @@ void tambahKeKeranjang(int idLogin, Keranjang keranjang[], int *keranjangCount, 
     keranjang[*keranjangCount].id_pembeli = idLogin;
 
     (*keranjangCount)++;
+    printf("============================\n");
     printf("Barang berhasil ditambahkan ke keranjang!\n");
+    printf("============================\n");
 
     // Simpan keranjang ke file
     simpanKeranjangKeFile(keranjang, *keranjangCount);
@@ -421,14 +422,70 @@ void checkout(int idLogin) {
     int keranjangCount = bacaKeranjangDariFile(keranjang, idLogin);
 
     int metodePembayaran = 0;
+    int pilihanCheckout = 0;
     char konfpem;
 
-    for (int i = 0; i < keranjangCount; i++) {
-        totalHarga += keranjang[i].harga * keranjang[i].jumlah;
+    if (keranjangCount == 0) {
+        printf("Keranjang anda kosong.\n");
+        return;
     }
 
     printf("============================\n");
-    printf("Total Pembayaran: Rp. %d\n", totalHarga);
+    printf("Checkout:\n");
+    printf("1. Checkout Semua Barang\n");
+    printf("2. Checkout Satu Barang\n");
+    printf("Pilih: ");
+    scanf("%d", &pilihanCheckout);
+
+    Keranjang checkoutItems[100];
+    int checkoutCount = 0;
+
+    if (pilihanCheckout == 1) {
+        // Checkout semua barang
+        for (int i = 0; i < keranjangCount; i++) {
+            checkoutItems[i] = keranjang[i];
+            totalHarga += keranjang[i].harga * keranjang[i].jumlah;
+        }
+        checkoutCount = keranjangCount;
+
+        // Kosongkan keranjang setelah checkout semua barang
+        keranjangCount = 0;
+
+    } else if (pilihanCheckout == 2) {
+        // Checkout satu barang
+        printf("============================\n");
+        printf("Pilih barang untuk checkout (1-%d): ", keranjangCount);
+        int pilihanBarang;
+        scanf("%d", &pilihanBarang);
+
+        if (pilihanBarang >= 1 && pilihanBarang <= keranjangCount) {
+            int index = pilihanBarang - 1;
+
+            // Tambahkan barang ke daftar checkout
+            checkoutItems[0] = keranjang[index];
+            totalHarga = keranjang[index].harga * keranjang[index].jumlah;
+            checkoutCount = 1;
+
+            // Geser barang di keranjang untuk menghapus barang yang di-checkout
+            for (int i = index; i < keranjangCount - 1; i++) {
+                keranjang[i] = keranjang[i + 1];
+            }
+            keranjangCount--;
+        } else {
+            printf("Pilihan tidak valid!\n");
+            return;
+        }
+    } else {
+        printf("Pilihan tidak valid!\n");
+        return;
+    }
+
+    // Format harga menjadi ribuan
+    char totalHargaFor[100];
+    formatRibuan(totalHarga, totalHargaFor);
+
+    printf("============================\n");
+    printf("Total Pembayaran: Rp. %s\n", totalHargaFor);
     printf("============================\n");
     printf("Silahkan pilih metode pembayaran:\n");
     printf("1. RisaizPay\n");
@@ -437,35 +494,44 @@ void checkout(int idLogin) {
 
     if (metodePembayaran == 1) {
         saldo = HanyaTampilkanSaldo(idLogin);
-        printf("Lakukan Pembayaran Sebesar Rp.%d\n", totalHarga);
+        printf("Lakukan Pembayaran Sebesar Rp.%s\n", totalHargaFor);
         printf("============================\n");
         printf("Konfirmasi Pembayaran (y/n): ");
-        scanf("%s", &konfpem);
+        scanf(" %c", &konfpem);
 
-        if (konfpem == 'y' || konfpem == 'Y')
-        {
-            // lakukan checkout pembayaran
-            if (totalHarga <= saldo)
-            {
-                tulisPesanan(idLogin);
+        if (konfpem == 'y' || konfpem == 'Y') {
+            if (totalHarga <= saldo) {
+                // Lakukan proses checkout
+                tulisPesanan(idLogin, checkoutItems, checkoutCount);
+
+                // Update keranjang di file
                 FILE *file = fopen(keranjang_file, "w");
                 if (file == NULL) {
                     perror("Gagal membuka file");
                 } else {
+                    // Tulis kembali barang yang tersisa di keranjang
+                    for (int i = 0; i < keranjangCount; i++) {
+                        // printf("%d\n", keranjang[i].id);
+                        fprintf(file, "%d,%d,%d,%d,%d\n", 
+                            keranjang[i].id, 
+                            keranjang[i].id_barang, 
+                            keranjang[i].jumlah, 
+                            keranjang[i].harga, 
+                            keranjang[i].id_pembeli);
+                    }
                     fclose(file);
                 }
-            }else {
+                printf("Checkout berhasil!\n");
+            } else {
                 printf("============================\n");
                 printf("Saldo anda tidak mencukupi!! Silahkan lakukan TopUp!\n");
                 printf("============================\n");
             }
-
-        }else if(konfpem == 'n' || konfpem == 'N') {
+        } else if (konfpem == 'n' || konfpem == 'N') {
             printf("============================\n");
             printf("Pembayaran Dibatalkan\n");
             printf("============================\n");
-            return;
-        }else {
+        } else {
             printf("Input Tidak Valid\n");
         }
     } else {
@@ -475,18 +541,10 @@ void checkout(int idLogin) {
 
 //! tulis pesanan punya faiz
 
-void tulisPesanan(int idLogin) {
+void tulisPesanan(int idLogin, Keranjang *barangCheckout, int barangCount) {
     char username[50], password[50], phone[16], alamat[50], store_name[50];
     int rekening, role;
     CariAkun(idLogin, username, password, phone, alamat, &rekening, &role, store_name);
-
-    Keranjang keranjang[100];
-    int keranjangCount = bacaKeranjangDariFile(keranjang, idLogin);
-    int totalHarga = 0;
-
-    for (int i = 0; i < keranjangCount; i++) {
-        totalHarga += keranjang[i].harga * keranjang[i].jumlah;
-    }
 
     FILE *file = fopen(file_pemesanan, "a");
     if (file == NULL) {
@@ -546,18 +604,17 @@ void tulisPesanan(int idLogin) {
     char nomorPesanan[20];
     snprintf(nomorPesanan, sizeof(nomorPesanan), "%s%02d", tanggalPesanan, increment);
 
-    Pesanan pesanan[100]; // Menggunakan struct Pesanan
+    Pesanan pesanan[100];
     int pesananCount = 0;
 
-    // Simpan pesanan ke dalam struct sebelum menulis ke file
-    for (int i = 0; i < keranjangCount; i++) {
+    for (int i = 0; i < barangCount; i++) {
         Product product[100];
         int productCount = bacaProductDariFile(product);
         int ditemukan = 0;
         int idPenjual = 0;
 
         for (int j = 0; j < productCount; j++) {
-            if (product[j].id == keranjang[i].id_barang) {
+            if (product[j].id == barangCheckout[i].id_barang) {
                 idPenjual = product[j].id_penjual;
                 ditemukan = 1;
                 break;
@@ -565,20 +622,20 @@ void tulisPesanan(int idLogin) {
         }
 
         if (!ditemukan) {
-            printf("Barang dengan ID %d tidak ditemukan.\n", keranjang[i].id_barang);
-            return;
+            printf("Barang dengan ID %d tidak ditemukan.\n", barangCheckout[i].id_barang);
+            continue;
         }
 
         pesanan[pesananCount].id_pesanan = ++last_id;
         strcpy(pesanan[pesananCount].nomorPesanan, nomorPesanan);
         pesanan[pesananCount].id_pembeli = idLogin;
         pesanan[pesananCount].id_penjual = idPenjual;
-        pesanan[pesananCount].id_kurir = 0; // Default
+        pesanan[pesananCount].id_kurir = 0;
         strcpy(pesanan[pesananCount].tanggalPesanan, tanggalPesanan);
-        pesanan[pesananCount].id_barang = keranjang[i].id_barang;
-        pesanan[pesananCount].jumlah = keranjang[i].jumlah;
-        pesanan[pesananCount].harga = keranjang[i].harga;
-        pesanan[pesananCount].total = keranjang[i].harga * keranjang[i].jumlah;
+        pesanan[pesananCount].id_barang = barangCheckout[i].id_barang;
+        pesanan[pesananCount].jumlah = barangCheckout[i].jumlah;
+        pesanan[pesananCount].harga = barangCheckout[i].harga;
+        pesanan[pesananCount].total = barangCheckout[i].harga * barangCheckout[i].jumlah;
         strcpy(pesanan[pesananCount].alamat, alamat);
         strcpy(pesanan[pesananCount].expedisi, "GoRisaiz");
         strcpy(pesanan[pesananCount].status_pembayaran, "Belum Dikonfirmasi");
@@ -587,7 +644,7 @@ void tulisPesanan(int idLogin) {
         pesananCount++;
 
         // Kurangi stok produk
-        upStokProduct(keranjang[i].id_barang, keranjang[i].jumlah);
+        upStokProduct(barangCheckout[i].id_barang, barangCheckout[i].jumlah);
     }
 
     // Tulis data pesanan dari struct ke file
@@ -610,8 +667,8 @@ void tulisPesanan(int idLogin) {
     }
 
     fclose(file);
-    printf("Pesanan berhasil disimpan ke file %s.\n", file_pemesanan);
 }
+
 
 
 // mengurangi stock di database product
@@ -652,7 +709,7 @@ void upStokProduct(int idBarang, int jumlah) {
     }
 
     fclose(file);
-    printf("Stok untuk barang dengan ID %d berhasil diperbarui.\n", idBarang);
+    // printf("Stok untuk barang dengan ID %d berhasil diperbarui.\n", idBarang);
 }
 
 // Fungsi untuk menghapus atau mengurangi qty barang di keranjang
@@ -679,7 +736,7 @@ void hapusDariKeranjang(int idLogin) {
     if (hapusBarang >= 1 && hapusBarang <= keranjangCount) {
         int index = hapusBarang - 1;
 
-        printf("Pilih tindakan:\n1. Hapus semua\n2. Kurangi qty\nMasukkan pilihan (1/2): ");
+        printf("Pilih tindakan:\n1. Hapus semua\n2. Kurangi qty\n3. Kembali\nMasukkan pilihan (1/3): ");
         int pilihan;
         scanf("%d", &pilihan);
 
@@ -709,21 +766,15 @@ void hapusDariKeranjang(int idLogin) {
             } else {
                 printf("Jumlah pengurangan tidak valid.\n");
             }
-        } else {
+        } else if(pilihan == 3){
+            return;
+        }else {
             printf("Pilihan tidak valid.\n");
         }
 
         simpanKeranjangKeFile(keranjang, keranjangCount);
     } else {
         printf("Pilihan tidak valid!\n");
-    }
-}
-
-void konfirmasiPesanan(int *statusPesanan) {
-    if (*statusPesanan) {
-        printf("Pesanan Anda sudah dikonfirmasi!\n");
-    } else {
-        printf("Pesanan Anda belum dikonfirmasi.\n");
     }
 }
 
@@ -794,13 +845,21 @@ void tampilkanPesananUser(int idLogin) {
                 }
             }
 
+            // Format harga menjadi ribuan
+            char hargaSatuanFor[100];
+            formatRibuan(pesanan[i].harga, hargaSatuanFor);
+            
+            // Format harga menjadi ribuan
+            char totalHargaFor[100];
+            formatRibuan(pesanan[i].total, totalHargaFor);
+
             // Menampilkan data pesanan
             printf("Barang %d:\n", i + 1);
             printf("  Nomor Pesanan     : %s\n", pesanan[i].nomorPesanan);
             printf("  Nama Barang       : %s\n", temp_namaProduct);
             printf("  Jumlah            : %d\n", pesanan[i].jumlah);
-            printf("  Harga Satuan      : Rp.%d\n", pesanan[i].harga);
-            printf("  Total Harga       : Rp.%d\n", pesanan[i].total);
+            printf("  Harga Satuan      : Rp.%s\n", hargaSatuanFor);
+            printf("  Total Harga       : Rp.%s\n", totalHargaFor);
             printf("  Nama Toko         : %s\n", temp_namaToko);
             printf("  Expedisi          : %s\n", pesanan[i].expedisi);
             printf("  Status Pembayaran : %s\n", pesanan[i].status_pembayaran);

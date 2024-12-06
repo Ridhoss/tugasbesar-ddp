@@ -35,16 +35,13 @@ void simpanKeranjangKeFile(Keranjang keranjang[], int keranjangCount);
 
 void checkout(int idLogin);
 
-void tulisPesanan(int idLogin);
+void tulisPesanan(int idLogin, Keranjang *barangCheckout, int barangCount);
 
 void upStokProduct(int idBarang, int jumlah);
-
 
 void hapusDariKeranjang(int idLogin);
 
 void simpanPesanan(Keranjang keranjang[], int keranjangCount);
-
-void konfirmasiPesanan(int *statusPesanan);
 
 void statusPengiriman(int *pengiriman);
 

@@ -5,6 +5,7 @@
 #include "../masuk/masuk.h"
 #include "../penjual/penjual.h"
 #include "../pesanan/pesanan.h"
+#include "../pembeli/pembeli.h"
 
 
 void CekRekening(int idLogin) {
@@ -18,7 +19,7 @@ void CekRekening(int idLogin) {
     for (;;) {
         printf("1. Topup Rekening\n");
         printf("2. Kembali Ke Halaman Utama\n");
-        printf("Pilih : ");
+        printf("Pilih:(1/2) ");
         scanf("%d", &pilih);
 
         if (pilih == 1) {
@@ -52,8 +53,12 @@ int HanyaTampilkanSaldo(int idLogin) {
 
     int totalSaldo = rekening - totalHargaPesanan;
 
+    // Format harga menjadi ribuan
+    char totalSaldoFor[100];
+    formatRibuan(totalSaldo, totalSaldoFor);
+
     printf("===========================\n");
-    printf("Saldo Rekening Anda = Rp.%d\n", totalSaldo);
+    printf("Saldo Rekening Anda = Rp.%s\n", totalSaldoFor);
 
     return totalSaldo;
 }
@@ -92,12 +97,17 @@ void TopUp(int idLogin) {
     // Cari data akun
     CariAkun(idLogin, username, password, phone, alamat, &rekening, &role, store_name);
 
+
     int saldo_sekarang = HanyaTampilkanSaldo(idLogin);
+
+    // Format harga menjadi ribuan
+    char totalSaldoSekarang[100];
+    formatRibuan(saldo_sekarang, totalSaldoSekarang);
 
     // Tampilkan informasi pengguna
     printf("=======================\n");
     printf("Username: %s\n", username);
-    printf("Saldo Saat Ini: %d\n", saldo_sekarang);
+    printf("Saldo Saat Ini: %s\n", totalSaldoSekarang);
     printf("=======================\n");
 
     // Minta input jumlah top-up

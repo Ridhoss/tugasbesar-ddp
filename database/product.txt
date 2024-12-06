@@ -1,2 +1,2 @@
-1,monitor,elektronik,300000,13,1
+1,monitor,elektronik,300000,4,1
 2,mouse,elektronik,20000,4,1
