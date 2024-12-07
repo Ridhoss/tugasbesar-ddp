@@ -27,8 +27,7 @@ void halamanAdmin(int *loggedIn, int idLogin){
 
     const int MAX_PRODUCTS = 100;
     Product products[MAX_PRODUCTS];
-    int count = 0;
-
+    int count = loadProducts(products);
     int choice;
     do {
         printf("==== Halaman Admin ====\n");
@@ -128,6 +127,24 @@ void saveProducts(Product *products, int count, int idLogin) {
     printf("Produk berhasil disimpan.\n");
 }
 
+int loadProducts(Product *products) {
+    FILE *file = fopen(file_products, "r");
+    if (!file) {
+        printf("Gagal membuka file untuk membaca data.\n");
+        return 0;
+    }
+
+    int count = 0;
+    while (fscanf(file, "%d,%[^,],%[^,],%d,%d,%d\n", 
+                  &products[count].id, products[count].name, products[count].category, 
+                  &products[count].price, &products[count].stock, &products[count].id_penjual) == 6) {
+        count++;
+    }
+
+    fclose(file);
+    return count;
+}
+
 // Menampilkan produk milik toko tertentu
 void viewProduct(Product *products, int count, int idLogin) {
     int found = 0;
@@ -161,11 +178,11 @@ void editProduct(Product *products, int count, int idLogin) {
                 return;
             }
             printf("Masukkan Nama Produk baru: ");
-            scanf("%s", products[i].name);
+            scanf(" %[^\n]", products[i].name);
             printf("Masukkan Kategori baru: ");
-            scanf("%s", products[i].category);
+            scanf(" %[^\n]", products[i].category);
             printf("Masukkan Harga baru: ");
-            scanf("%f", &products[i].price);
+            scanf("%d", &products[i].price);
             printf("Masukkan Stok baru: ");
             scanf("%d", &products[i].stock);
             found = 1;
@@ -264,7 +281,7 @@ void listPesanan(Pesanan pesanan[], int idLogin) {
 }
 
 
-int bacaProductDariFile(Product product[]) {
+int bacaProductDariFile(Product *products) {
     FILE *file = fopen(file_products, "r");
     if (!file) {
         printf("Product kosong atau file tidak ditemukan.\n");
@@ -277,13 +294,13 @@ int bacaProductDariFile(Product product[]) {
     int temp_id, temp_price, temp_stock, temp_id_penjual;
 
     while (fscanf(file, "%d,%49[^,],%29[^,],%d,%d,%d\n", &temp_id, temp_name, temp_category, &temp_price, &temp_stock, &temp_id_penjual) == 6) {
-            product[count].id = temp_id;
-            strcpy(product[count].name, temp_name);
-            strcpy(product[count].category, temp_category);
-            product[count].price = temp_price;
-            product[count].stock = temp_stock;
-            product[count].id_penjual = temp_id_penjual;
-            count++;
+        products[count].id = temp_id;
+        strcpy(products[count].name, temp_name);
+        strcpy(products[count].category, temp_category);
+        products[count].price = temp_price;
+        products[count].stock = temp_stock;
+        products[count].id_penjual = temp_id_penjual;
+        count++;
     }
     fclose(file);
     return count;
@@ -351,3 +368,4 @@ int cariKurir() {
     fclose(file);
     return -1; // Tidak ada kurir ditemukan
 }
+
