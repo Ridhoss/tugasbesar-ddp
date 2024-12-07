@@ -17,6 +17,7 @@ void halamanAdmin(int *loggedIn, int idLogin){
     int rekening, role;
     Pesanan pesanan[100];
 
+
     CariAkun(idLogin, username, password, phone, alamat, &rekening, &role, store_name);
 
     int conlog;
@@ -26,6 +27,11 @@ void halamanAdmin(int *loggedIn, int idLogin){
     printf("=== Selamat Datang %s ===\n", store_name);
     printf("===========================\n");
 
+        const int MAX_PRODUCTS = 100;
+        Product products[MAX_PRODUCTS];
+        int count = 0;
+        count = loadProducts(products, MAX_PRODUCTS);
+    
     int choice;
     do {
         printf("===========================\n");
@@ -40,7 +46,7 @@ void halamanAdmin(int *loggedIn, int idLogin){
         scanf("%d", &choice);
         switch (choice) {
             case 1:
-                daftarProduk(idLogin);
+                viewProduct(products, count, idLogin);
                 break;
             case 2:
                 pengelolaanProduct(idLogin);
@@ -70,14 +76,17 @@ void pengelolaanProduct(int idLogin) {
     Product products[MAX_PRODUCTS];
     int count = 0;
 
+    count = loadProducts(products, MAX_PRODUCTS);
+
+    viewProduct(products, count, idLogin);
+
     int choice;
         do {
         printf("1. Tambah Produk\n");
         printf("2. Edit Produk\n");
         printf("3. Hapus Produk\n");
-        printf("4. List Produk\n");
-        printf("5. Simpan Produk\n");
-        printf("6. Kembali\n");
+        printf("4. Simpan Produk\n");
+        printf("5. Kembali\n");
         printf("Masukan pilihan:(1-6) ");
         scanf("%d", &choice);
         switch (choice) {
@@ -91,44 +100,14 @@ void pengelolaanProduct(int idLogin) {
                 deleteProduct(products, &count,MAX_PRODUCTS, idLogin);
                 break;
             case 4:
-                viewProduct(products, count, idLogin);
-                break;
-            case 5:
                 saveProducts(products, count, idLogin);
                 break;
-            case 6:
+            case 5:
                 break;
             default:
                 printf("Pilihan tidak ada\n");
         }
     } while (choice != 6);
-}
-
-void daftarProduk(int idLogin) {
-    Product products[100];
-    int productCount = bacaProductDariFile(products);
-    int found = 0;
-
-    printf("===========================\n");
-    printf("====== Daftar Produk ======\n");
-    printf("===========================\n");
-    
-    for (int i = 0; i < productCount; i++) {
-        if (products[i].id_penjual == idLogin) {
-            printf("ID Product       : %d\n", products[i].id);
-            printf("Nama Product     : %s\n", products[i].name);
-            printf("Kategori Product : %s\n", products[i].category);
-            printf("Harga Product    : %d\n", products[i].price);
-            printf("Stok Product     : %d\n", products[i].stock);
-            printf("--------------------------------\n");
-
-            found = 1;
-        }
-    }
-
-    if (!found) {
-        printf("Tidak ada produk sementara yang ditemukan.\n");
-    }
 }
 
 void addProduct(Product *products, int *count, int max_count, int idLogin) {
@@ -188,7 +167,7 @@ void saveProducts(Product *products, int count, int idLogin) {
 void viewProduct(Product *products, int count, int idLogin) {
     int found = 0;
     printf("===========================\n");
-    printf("--- Daftar Produk Sementara ---\n");
+    printf("--- Daftar Produk ---\n");
     printf("===========================\n");
     printf("Produk yang dimiliki oleh toko %d:\n", idLogin);
     for (int i = 0; i < count; i++) {
@@ -227,7 +206,7 @@ void editProduct(Product *products, int count, int idLogin) {
             printf("Masukkan Kategori baru: ");
             scanf("%s", products[i].category);
             printf("Masukkan Harga baru: ");
-            scanf("%f", &products[i].price);
+            scanf("%d", &products[i].price);
             printf("Masukkan Stok baru: ");
             scanf("%d", &products[i].stock);
             found = 1;
@@ -546,4 +525,34 @@ int cariKurir() {
 
     fclose(file);
     return -1; // Tidak ada kurir ditemukan
+}
+
+int loadProducts(Product *products, int max_count) {
+    FILE *file = fopen(file_products, "r");
+    if (!file) {
+        printf("Tidak ada data.\n");
+        return 0;
+    }
+    int count = 0;
+    printf("Memuat produk...\n");
+    while (fscanf(file, "%d,%49[^,],%29[^,],%d,%d,%d\n",
+                  &products[count].id, products[count].name,
+                  products[count].category, &products[count].price,
+                  &products[count].stock, &products[count].id_penjual) == 6) {
+        // Cek duplikasi ID
+        int isDuplicate = 0;
+        for (int i = 0; i < count; i++) {
+            if (products[i].id == products[count].id) {
+                isDuplicate = 1;
+                break;
+            }
+        }
+        if (!isDuplicate) {
+            count++;
+        }
+        if (count >= max_count) break;
+    }
+    fclose(file);
+    printf("Memuat %d produk dari file.\n", count);
+    return count;
 }

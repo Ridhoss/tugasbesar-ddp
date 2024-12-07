@@ -17,8 +17,6 @@ void halamanAdmin(int *loggedIn, int idLogin);
 
 void pengelolaanProduct(int idLogin);
 
-void daftarProduk(int idLogin);
-
 // Menambahkan produk baru ke dalam daftar produk
 void addProduct(Product *products, int *count, int max_count, int idLogin);
 
@@ -42,5 +40,7 @@ int bacaProductDariFile(Product product[]);
 int bacaFilePesanan(Pesanan pesanan[]);
 
 int cariKurir();
+
+int loadProducts(Product *products, int max_count);
 
 #endif
