@@ -42,8 +42,6 @@ void upStokProduct(int idBarang, int jumlah);
 
 void hapusDariKeranjang(int idLogin);
 
-void simpanPesanan(Keranjang keranjang[], int keranjangCount);
-
 void tampilkanPesananUser(int idLogin);
 
 void transferAfterConfirm(int idLogin, int idPes);

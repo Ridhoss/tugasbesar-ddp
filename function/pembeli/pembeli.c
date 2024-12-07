@@ -791,27 +791,6 @@ void hapusDariKeranjang(int idLogin) {
     }
 }
 
-void simpanPesanan(Keranjang keranjang[], int keranjangCount) {
-    FILE *file = fopen(file_pemesanan, "a"); // Buka file dalam mode append
-    if (file == NULL) {
-        printf("Gagal membuka file %s untuk menyimpan pesanan.\n", file_pemesanan);
-        return;
-    }
-
-    fprintf(file, "=== PESANAN BARU ===\n");
-    for (int i = 0; i < keranjangCount; i++) {
-        float totalHargaBarang = keranjang[i].harga * keranjang[i].jumlah;
-        fprintf(file, "Nama Barang: %d\n", keranjang[i].id_barang);
-        fprintf(file, "Jumlah: %d\n", keranjang[i].jumlah);
-        fprintf(file, "Harga Satuan: Rp.%d\n", keranjang[i].harga);
-        fprintf(file, "Harga Total: Rp.%d\n", totalHargaBarang);
-        fprintf(file, "-----------------------\n");
-    }
-    fprintf(file, "\n");
-
-    fclose(file); // Tutup file setelah selesai
-    printf("Pesanan berhasil disimpan ke file %s.\n", file_pemesanan);
-}
 
 void tampilkanPesananUser(int idLogin) {
     printf("==============================\n");
