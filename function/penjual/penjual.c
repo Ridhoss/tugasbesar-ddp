@@ -188,7 +188,7 @@ void viewProduct(Product *products, int count, int idLogin) {
     }
 
     if (!found) {
-        printf("Tidak ada produk sementara yang ditemukan.\n");
+        printf("Tidak ada produk yang ditemukan.\n");
     }
 }
 
