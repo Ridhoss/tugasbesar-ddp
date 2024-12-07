@@ -52,4 +52,6 @@ void transferAfterConfirm(int idLogin, int idPes);
 
 void updateSaldoUser(Akun akun[], int count);
 
+int generateIdKeranjang();
+
 #endif

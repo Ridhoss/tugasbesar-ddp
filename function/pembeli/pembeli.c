@@ -254,10 +254,21 @@ void tampilkanKatalog(Product products[], int jumlahProduk, int idLogin) {
 
 //! KERANJANG
 // ridho
+int generateIdKeranjang() {
+    static int id = 0;  // Static untuk mempertahankan nilai antar pemanggilan
+    return ++id;
+}
+
 void simpanKeranjangKeFile(Keranjang keranjang[], int keranjangCount) {
     FILE *file = fopen(keranjang_file, "w");
     if (!file) {
         printf("Gagal menyimpan keranjang ke file.\n");
+        return;
+    }
+
+    if (keranjangCount == 0) {
+        printf("Keranjang kosong, tidak ada yang disimpan ke file.\n");
+        fclose(file);
         return;
     }
 
@@ -272,7 +283,6 @@ void simpanKeranjangKeFile(Keranjang keranjang[], int keranjangCount) {
     fclose(file);
 }
 
-// ridho
 void tambahKeKeranjang(int idLogin, Keranjang keranjang[], int *keranjangCount, Product products[], int pilihanProduk, int jumlahBeli) {
     int idBarang = products[pilihanProduk - 1].id;
     int stokTersedia = products[pilihanProduk - 1].stock;
@@ -285,24 +295,22 @@ void tambahKeKeranjang(int idLogin, Keranjang keranjang[], int *keranjangCount, 
         }
     }
 
-    // Periksa apakah jumlah barang yang akan ditambahkan melebihi stok
     if (totalBarangDiKeranjang + jumlahBeli > stokTersedia) {
         printf("Stok tidak mencukupi untuk menambah barang ke keranjang!\n");
         printf("Stok tersedia: %d, jumlah di keranjang: %d\n", stokTersedia - totalBarangDiKeranjang, totalBarangDiKeranjang);
         return;
     }
 
-    // Periksa apakah barang sudah ada di keranjang
     for (int i = 0; i < *keranjangCount; i++) {
         if (keranjang[i].id_barang == idBarang && keranjang[i].id_pembeli == idLogin) {
-            keranjang[i].jumlah += jumlahBeli;  // Perbarui jumlah barang
+            keranjang[i].jumlah += jumlahBeli;
             printf("Jumlah barang di keranjang berhasil diperbarui!\n");
-            simpanKeranjangKeFile(keranjang, *keranjangCount);  // Simpan perubahan
+            simpanKeranjangKeFile(keranjang, *keranjangCount);
             return;
         }
     }
 
-    // Jika barang belum ada di keranjang, tambahkan sebagai entri baru
+    keranjang[*keranjangCount].id = generateIdKeranjang();
     keranjang[*keranjangCount].id_barang = idBarang;
     keranjang[*keranjangCount].harga = products[pilihanProduk - 1].price;
     keranjang[*keranjangCount].jumlah = jumlahBeli;
@@ -313,7 +321,6 @@ void tambahKeKeranjang(int idLogin, Keranjang keranjang[], int *keranjangCount, 
     printf("Barang berhasil ditambahkan ke keranjang!\n");
     printf("============================\n");
 
-    // Simpan keranjang ke file
     simpanKeranjangKeFile(keranjang, *keranjangCount);
 }
 
@@ -580,7 +587,7 @@ void tulisPesanan(int idLogin, Keranjang *barangCheckout, int barangCount, int o
     struct tm *waktu = localtime(&t);
 
     snprintf(tanggalPesanan, sizeof(tanggalPesanan), "%02d%02d%04d",
-             waktu->tm_mday, waktu->tm_mon + 1, (waktu->tm_year + 1900) % 100);
+             waktu->tm_mday, waktu->tm_mon + 1, (waktu->tm_year + 1900));
 
     // Cek increment terakhir untuk nomor pesanan
     int increment = 1;
