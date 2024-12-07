@@ -91,7 +91,7 @@ void pengelolaanProduct(int idLogin) {
         printf("3. Hapus Produk\n");
         printf("4. Simpan Produk\n");
         printf("5. Kembali\n");
-        printf("Masukan pilihan:(1-6) ");
+        printf("Masukan pilihan:(1-5) ");
         scanf("%d", &choice);
         switch (choice) {
             case 1:
@@ -111,7 +111,7 @@ void pengelolaanProduct(int idLogin) {
             default:
                 printf("Pilihan tidak ada\n");
         }
-    } while (choice != 6);
+    } while (choice != 5);
 }
 
 void addProduct(Product *products, int *count, int max_count, int idLogin) {
