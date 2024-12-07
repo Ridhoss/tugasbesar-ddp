@@ -19,7 +19,7 @@ void CekRekening(int idLogin) {
     for (;;) {
         printf("1. Topup Rekening\n");
         printf("2. Kembali Ke Halaman Utama\n");
-        printf("Pilih:(1/2) ");
+        printf("Pilih:(1-2) ");
         scanf("%d", &pilih);
 
         if (pilih == 1) {

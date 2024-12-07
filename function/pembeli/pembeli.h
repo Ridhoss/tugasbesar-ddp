@@ -47,4 +47,6 @@ void statusPengiriman(int *pengiriman);
 
 void tampilkanPesananUser(int idLogin);
 
+void transferAfterConfirm(int idLogin, int idPes);
+
 #endif

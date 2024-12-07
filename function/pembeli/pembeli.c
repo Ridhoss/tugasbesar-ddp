@@ -3,6 +3,7 @@
 #include "../masuk/masuk.h"
 #include "../topup/topup.h"
 #include "../pesanan/pesanan.h"
+#include "../kurir/kurir.h"
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
@@ -38,7 +39,7 @@ void halamanUser(int *loggedIn, int idLogin) {
         printf("4. Cek Rekening\n");
         printf("5. Logout\n");
         printf("============================\n");
-        printf("Pilih menu:(1/5) ");
+        printf("Pilih menu:(1-5) ");
         scanf("%d", &pilihanMenu);
 
         switch (pilihanMenu) {
@@ -53,7 +54,7 @@ void halamanUser(int *loggedIn, int idLogin) {
                     printf("============================\n");
                     printf("1. Beli Barang\n");
                     printf("2. Kembali\n");
-                    printf("Apakah ingin membeli barang:(1/2) ");
+                    printf("Apakah ingin membeli barang:(1-2) ");
                     scanf("%d", &pilihan);
 
                     if (pilihan == 1)
@@ -75,7 +76,7 @@ void halamanUser(int *loggedIn, int idLogin) {
                 printf("1. Checkout\n");
                 printf("2. Hapus Barang dari Keranjang\n");
                 printf("3. Kembali\n");
-                printf("Pilih:(1/3) ");
+                printf("Pilih:(1-3) ");
                 scanf("%d", &pilihanKeranjang);
 
                 if (pilihanKeranjang == 1) {
@@ -434,7 +435,7 @@ void checkout(int idLogin) {
     printf("Checkout:\n");
     printf("1. Checkout Semua Barang\n");
     printf("2. Checkout Satu Barang\n");
-    printf("Pilih: ");
+    printf("Pilih:(1-2) ");
     scanf("%d", &pilihanCheckout);
 
     Keranjang checkoutItems[100];
@@ -489,7 +490,7 @@ void checkout(int idLogin) {
     printf("============================\n");
     printf("Silahkan pilih metode pembayaran:\n");
     printf("1. RisaizPay\n");
-    printf("Pilih: ");
+    printf("Pilih:(1) ");
     scanf("%d", &metodePembayaran);
 
     if (metodePembayaran == 1) {
@@ -669,8 +670,6 @@ void tulisPesanan(int idLogin, Keranjang *barangCheckout, int barangCount) {
     fclose(file);
 }
 
-
-
 // mengurangi stock di database product
 // ridho
 void upStokProduct(int idBarang, int jumlah) {
@@ -736,7 +735,7 @@ void hapusDariKeranjang(int idLogin) {
     if (hapusBarang >= 1 && hapusBarang <= keranjangCount) {
         int index = hapusBarang - 1;
 
-        printf("Pilih tindakan:\n1. Hapus semua\n2. Kurangi qty\n3. Kembali\nMasukkan pilihan (1/3): ");
+        printf("Pilih tindakan:\n1. Hapus semua\n2. Kurangi qty\n3. Kembali\nMasukkan pilihan (1-3): ");
         int pilihan;
         scanf("%d", &pilihan);
 
@@ -838,7 +837,7 @@ void tampilkanPesananUser(int idLogin) {
             int totalProduct = bacaProductDariFile(products);
             char temp_namaProduct[50];
 
-            for (int g = 0; g < totalAkun ; g++) {
+            for (int g = 0; g < totalProduct ; g++) {
                 if (products[g].id == pesanan[i].id_barang)
                 {
                     strcpy(temp_namaProduct, products[g].name);
@@ -855,6 +854,7 @@ void tampilkanPesananUser(int idLogin) {
 
             // Menampilkan data pesanan
             printf("Barang %d:\n", i + 1);
+            printf("  ID Pesanan        : %d\n", pesanan[i].id_pesanan);
             printf("  Nomor Pesanan     : %s\n", pesanan[i].nomorPesanan);
             printf("  Nama Barang       : %s\n", temp_namaProduct);
             printf("  Jumlah            : %d\n", pesanan[i].jumlah);
@@ -870,10 +870,68 @@ void tampilkanPesananUser(int idLogin) {
         }
     }
 
+    int pilKonf = 0;
+
+    for (;;)
+    {
+        printf("1. Pilih Barang Untuk Dikonfirmasi\n");
+        printf("2. Kembali\n");
+        printf("Pilih:(1-2) ");
+        scanf("%d", &pilKonf);
+
+        if(pilKonf == 1){
+            int idpes = 0;
+            int pesananDikonfirmasi = 0;
+
+            printf("Pilih ID Pemesanan: ");
+            scanf("%d", &idpes);
+
+            for (int i = 0; i < pesananCount; i++) {
+                if (pesanan[i].id_pesanan == idpes) {
+                    // Update status pengiriman
+                    strcpy(pesanan[i].status_pengiriman, "Pesanan Selesai");
+
+                    // Menyimpan perubahan ke file
+                    simpanFilePesanan(pesanan, pesananCount);
+                    pesananDikonfirmasi = 1;
+                    break;
+                }
+            }
+
+            if (!pesananDikonfirmasi) {
+                printf("Pesanan dengan ID %d tidak ditemukan atau tidak valid untuk dikonfirmasi.\n", idpes);
+            }
+
+            break;
+
+        }else if(pilKonf == 2){
+            break;
+        }else{
+            printf("Eror 404. Input Tidak Valid!\n");
+        }
+    }
+
     if (pesCount == 0) {
         printf("Tidak Ada Pesanan!\n");
         printf("==============================\n");
         return;
     }
+
+}
+
+void transferAfterConfirm(int idLogin, int idPes) {
+    // Pesanan pesanan[100];
+    // int pesananCount = bacaFilePesanan(pesanan);
+
+    // for (int i = 0; i < pesananCount; i++) {
+    //     if (pesanan[i].id_pembeli == idLogin)
+    //     {
+    //         if (pesanan[i].id_pesanan == idPes) {
+
+
+
+    //         }   
+    //     }
+    // }
 
 }

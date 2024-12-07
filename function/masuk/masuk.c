@@ -217,7 +217,7 @@ void Masuk(int *loggedIn, int *idLogin) {
         printf("1. Masuk\n");
         printf("2. Daftar\n");
         printf("3. Keluar Dari Aplikasi\n");
-        printf("Pilih : ");
+        printf("Pilih:(1-3) ");
         scanf("%d", &masuk);
 
         if (masuk == 1) {

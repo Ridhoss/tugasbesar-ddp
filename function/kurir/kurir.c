@@ -26,7 +26,7 @@ void halamanKurir(int *loggedIn, int idLogin) {
         printf("2. Konfirmasi Pengiriman\n");
         printf("3. Simpan Perubahan\n");
         printf("4. Logout\n");
-        printf("Masukan pilihan: ");
+        printf("Masukan pilihan:(1-4) ");
         scanf("%d", &choice);
 
         switch (choice) {
@@ -56,7 +56,7 @@ void simpanFilePesanan(Pesanan pesanan[], int count) {
         printf("Gagal membuka file pemesanan.txt untuk menulis.\n");
         return;
     }
-
+    
     for (int i = 0; i < count; i++) {
         fprintf(file, "%d,%s,%d,%d,%d,%s,%d,%d,%d,%d,%s,%s,%s,%s\n",
                 pesanan[i].id_pesanan, pesanan[i].nomorPesanan, pesanan[i].id_pembeli,

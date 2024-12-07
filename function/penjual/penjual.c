@@ -3,6 +3,7 @@
 #include <string.h>
 #include "penjual.h"
 #include "../pesanan/pesanan.h"
+#include "../pembeli/pembeli.h"
 #include "../masuk/masuk.h"
 #include "../topup/topup.h"
 #include "../kurir/kurir.h"
@@ -25,23 +26,59 @@ void halamanAdmin(int *loggedIn, int idLogin){
     printf("=== Selamat Datang %s ===\n", store_name);
     printf("===========================\n");
 
+    int choice;
+    do {
+        printf("===========================\n");
+        printf("==== Halaman Admin ====\n");
+        printf("===========================\n");
+        printf("1. Lihat Daftar Produk\n");
+        printf("2. Pengelolaan Produk\n");
+        printf("3. Cek Pesanan\n");
+        printf("4. Cek Rekening\n");
+        printf("5. Logout\n");
+        printf("Masukan pilihan:(1-5) ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1:
+                daftarProduk(idLogin);
+                break;
+            case 2:
+                pengelolaanProduct(idLogin);
+                break;
+            case 3:
+                listPesanan(pesanan, idLogin);
+                break;
+            case 4:
+                CekRekening(idLogin);
+                break;
+            case 5:
+                Logout(&conlog);
+                *loggedIn = conlog;
+                break;
+            default:
+                printf("Pilihan tidak ada\n");
+        }
+    } while (choice != 5);
+}
+
+void pengelolaanProduct(int idLogin) {
+    printf("===========================\n");
+    printf("====== Kelola Produk ======\n");
+    printf("===========================\n");
+
     const int MAX_PRODUCTS = 100;
     Product products[MAX_PRODUCTS];
     int count = 0;
 
     int choice;
-    do {
-        printf("==== Halaman Admin ====\n");
-        printf("===========================\n");
+        do {
         printf("1. Tambah Produk\n");
         printf("2. Edit Produk\n");
         printf("3. Hapus Produk\n");
         printf("4. List Produk\n");
         printf("5. Simpan Produk\n");
-        printf("6. Cek Pesanan\n");
-        printf("7. Cek Rekening\n");
-        printf("8. Logout\n");
-        printf("Masukan pilihan: ");
+        printf("6. Kembali\n");
+        printf("Masukan pilihan:(1-6) ");
         scanf("%d", &choice);
         switch (choice) {
             case 1:
@@ -60,19 +97,38 @@ void halamanAdmin(int *loggedIn, int idLogin){
                 saveProducts(products, count, idLogin);
                 break;
             case 6:
-                listPesanan(pesanan, idLogin);
-                break;
-            case 7:
-                CekRekening(idLogin);
-                break;
-            case 8:
-                Logout(&conlog);
-                *loggedIn = conlog;
                 break;
             default:
                 printf("Pilihan tidak ada\n");
         }
-    } while (choice != 8);
+    } while (choice != 6);
+}
+
+void daftarProduk(int idLogin) {
+    Product products[100];
+    int productCount = bacaProductDariFile(products);
+    int found = 0;
+
+    printf("===========================\n");
+    printf("====== Daftar Produk ======\n");
+    printf("===========================\n");
+    
+    for (int i = 0; i < productCount; i++) {
+        if (products[i].id_penjual == idLogin) {
+            printf("ID Product       : %d\n", products[i].id);
+            printf("Nama Product     : %s\n", products[i].name);
+            printf("Kategori Product : %s\n", products[i].category);
+            printf("Harga Product    : %d\n", products[i].price);
+            printf("Stok Product     : %d\n", products[i].stock);
+            printf("--------------------------------\n");
+
+            found = 1;
+        }
+    }
+
+    if (!found) {
+        printf("Tidak ada produk sementara yang ditemukan.\n");
+    }
 }
 
 void addProduct(Product *products, int *count, int max_count, int idLogin) {
@@ -131,19 +187,25 @@ void saveProducts(Product *products, int count, int idLogin) {
 // Menampilkan produk milik toko tertentu
 void viewProduct(Product *products, int count, int idLogin) {
     int found = 0;
-        printf("\n--- Daftar Produk ---\n");
+    printf("===========================\n");
+    printf("--- Daftar Produk Sementara ---\n");
+    printf("===========================\n");
     printf("Produk yang dimiliki oleh toko %d:\n", idLogin);
     for (int i = 0; i < count; i++) {
         if (products[i].id_penjual == idLogin) {
-            printf("ID: %d, Nama: %s, Kategori: %s, Harga: %d, Stok: %d\n",
-                products[i].id, products[i].name, products[i].category,
-                products[i].price, products[i].stock);
+            printf("ID Product       : %d\n", products[i].id);
+            printf("Nama Product     : %s\n", products[i].name);
+            printf("Kategori Product : %s\n", products[i].category);
+            printf("Harga Product    : %d\n", products[i].price);
+            printf("Stok Product     : %d\n", products[i].stock);
+            printf("--------------------------------\n");
+
             found = 1;
         }
     }
 
     if (!found) {
-        printf("Tidak ada produk yang ditemukan.\n");
+        printf("Tidak ada produk sementara yang ditemukan.\n");
     }
 }
 
@@ -213,53 +275,174 @@ void deleteProduct(Product *products, int *count, int max_count, int idLogin) {
 
 // Melihat Pesanan yang pembayarannya belum dikonfirmasi penjual
 void listPesanan(Pesanan pesanan[], int idLogin) {
-    int found = 0;
     int count = bacaFilePesanan(pesanan);
+    int pesCount = 0;
 
-    if (count == 0) {
-        printf("Pesanan belum tersedia atau semua pesanan sudah dikonfirmasi.\n");
-        return;
-    }
+    printf("================================\n");
+    printf("======== Daftar Pesanan ========\n");
+    printf("================================\n");
 
-    printf("\n--- Daftar Pesanan ---\n");
+    printf("================================\n");
+    printf("====== Sudah Dikonfirmasi ======\n");
+    printf("================================\n");
 
-    // Menampilkan semua pesanan yang belum terkonfirmasi
+    // Menampilkan semua pesanan yang sudah terkonfirmasi
     for (int i = 0; i < count; i++) {
-        printf("ID Pesanan: %d, Nomor: %s, Pembeli ID: %d, Barang ID: %d, Jumlah: %d, Total: %d, Status Pembayaran: %s, Status Pengiriman: %s\n",
-               pesanan[i].id_pesanan, pesanan[i].nomorPesanan, pesanan[i].id_pembeli,
-               pesanan[i].id_barang, pesanan[i].jumlah, pesanan[i].total,
-               pesanan[i].status_pembayaran, pesanan[i].status_pengiriman);
-    }
+        if(pesanan[i].id_penjual == idLogin){
+            if (strcmp(pesanan[i].status_pembayaran, "Terkonfirmasi") == 0)
+            {
+                Akun akun[100];
+                int totalAkun = BacaFileAkun(akun);
+                char usPembeli[50];
 
-    // Memilih pesanan untuk dikonfirmasi
-    int konfirmasiID;
-    printf("\nMasukkan ID Pesanan yang ingin dikonfirmasi pembayarannya: ");
-    scanf("%d", &konfirmasiID);
+                for (int j = 0; j < totalAkun ; j++) {
+                    if (akun[j].id == pesanan[i].id_pembeli)
+                    {
+                        strcpy(usPembeli, akun[j].username);
+                    }
+                }
 
-    int pesananDikonfirmasi = 0;
-    for (int i = 0; i < count; i++) {
-        if (pesanan[i].id_pesanan == konfirmasiID) {
-            // Update status pembayaran
-            strcpy(pesanan[i].status_pembayaran, "Terkonfirmasi");
+                Product products[100];
+                int totalProduct = bacaProductDariFile(products);
+                char temp_namaProduct[50];
 
-            // Assign pesanan ke kurir
-            int idKurir = cariKurir();
-            if (idKurir != -1) {
-                pesanan[i].id_kurir = idKurir;
-                printf("Pesanan berhasil diassign ke kurir dengan ID %d.\n", idKurir);
-            } else {
-                printf("Tidak ada kurir tersedia untuk assign pesanan.\n");
+                for (int g = 0; g < totalProduct ; g++) {
+                    if (products[g].id == pesanan[i].id_barang)
+                    {
+                        strcpy(temp_namaProduct, products[g].name);
+                    }
+                }
+
+                // Format harga menjadi ribuan
+                char hargaSatuanFor[100];
+                formatRibuan(pesanan[i].harga, hargaSatuanFor);
+                
+                // Format harga menjadi ribuan
+                char totalHargaFor[100];
+                formatRibuan(pesanan[i].total, totalHargaFor);
+
+                    // Menampilkan data pesanan
+                    printf("Pesanan %d:\n", i + 1);
+                    printf("  ID Pesanan        : %d\n", pesanan[i].id_pesanan);
+                    printf("  Pembeli           : %s\n", usPembeli);
+                    printf("  Nomor Pesanan     : %s\n", pesanan[i].nomorPesanan);
+                    printf("  Nama Barang       : %s\n", temp_namaProduct);
+                    printf("  Jumlah            : %d\n", pesanan[i].jumlah);
+                    printf("  Harga Satuan      : Rp.%s\n", hargaSatuanFor);
+                    printf("  Total Harga       : Rp.%s\n", totalHargaFor);
+                    printf("  Expedisi          : %s\n", pesanan[i].expedisi);
+                    printf("  Status Pembayaran : %s\n", pesanan[i].status_pembayaran);
+                    printf("  Status Pengiriman : %s\n", pesanan[i].status_pengiriman);
+                    printf("----------------------------\n");   
+
+                pesCount ++;
             }
-
-            // Menyimpan perubahan ke file
-            simpanFilePesanan(pesanan, count);
-            pesananDikonfirmasi = 1;
-            break;
         }
     }
 
-    if (!pesananDikonfirmasi) {
-        printf("Pesanan dengan ID %d tidak ditemukan atau tidak valid untuk dikonfirmasi.\n", konfirmasiID);
+    printf("================================\n");
+    printf("====== Belum Dikonfirmasi ======\n");
+    printf("================================\n");
+
+    // Menampilkan semua pesanan yang belum terkonfirmasi
+    for (int i = 0; i < count; i++) {
+        if(pesanan[i].id_penjual == idLogin){
+            if (strcmp(pesanan[i].status_pembayaran, "Belum Dikonfirmasi") == 0)
+            {
+                Akun akun[100];
+                int totalAkun = BacaFileAkun(akun);
+                char usPembeli[50];
+
+                for (int j = 0; j < totalAkun ; j++) {
+                    if (akun[j].id == pesanan[i].id_pembeli)
+                    {
+                        strcpy(usPembeli, akun[j].username);
+                    }
+                }
+
+                Product products[100];
+                int totalProduct = bacaProductDariFile(products);
+                char temp_namaProduct[50];
+
+                for (int g = 0; g < totalProduct ; g++) {
+                    if (products[g].id == pesanan[i].id_barang)
+                    {
+                        strcpy(temp_namaProduct, products[g].name);
+                    }
+                }
+
+                // Format harga menjadi ribuan
+                char hargaSatuanFor[100];
+                formatRibuan(pesanan[i].harga, hargaSatuanFor);
+                
+                // Format harga menjadi ribuan
+                char totalHargaFor[100];
+                formatRibuan(pesanan[i].total, totalHargaFor);
+
+                    // Menampilkan data pesanan
+                    printf("Pesanan %d:\n", i + 1);
+                    printf("  ID Pesanan        : %d\n", pesanan[i].id_pesanan);
+                    printf("  Pembeli           : %s\n", usPembeli);
+                    printf("  Nomor Pesanan     : %s\n", pesanan[i].nomorPesanan);
+                    printf("  Nama Barang       : %s\n", temp_namaProduct);
+                    printf("  Jumlah            : %d\n", pesanan[i].jumlah);
+                    printf("  Harga Satuan      : Rp.%s\n", hargaSatuanFor);
+                    printf("  Total Harga       : Rp.%s\n", totalHargaFor);
+                    printf("  Expedisi          : %s\n", pesanan[i].expedisi);
+                    printf("  Status Pembayaran : %s\n", pesanan[i].status_pembayaran);
+                    printf("  Status Pengiriman : %s\n", pesanan[i].status_pengiriman);
+                    printf("----------------------------\n");   
+
+                pesCount ++;
+            }
+        }
+    }
+
+    int pilKonfir = 0;
+    for (;;) {
+        printf("1. Lakukan Konfirmasi\n");
+        printf("2. Kembali\n");
+        printf("Pilih:(1-2) ");
+        scanf("%d", &pilKonfir);
+
+        if(pilKonfir == 1){
+            // Memilih pesanan untuk dikonfirmasi
+            int konfirmasiID;
+            printf("\nMasukkan ID Pesanan yang ingin dikonfirmasi pembayarannya: ");
+            scanf("%d", &konfirmasiID);
+
+            int pesananDikonfirmasi = 0;
+            for (int i = 0; i < count; i++) {
+                if (pesanan[i].id_pesanan == konfirmasiID) {
+                    // Update status pembayaran
+                    strcpy(pesanan[i].status_pembayaran, "Terkonfirmasi");
+
+                    // Assign pesanan ke kurir
+                    int idKurir = cariKurir();
+                    if (idKurir != -1) {
+                        pesanan[i].id_kurir = idKurir;
+                    } else {
+                        printf("Tidak ada kurir tersedia untuk assign pesanan.\n");
+                    }
+
+                    // Menyimpan perubahan ke file
+                    simpanFilePesanan(pesanan, count);
+                    pesananDikonfirmasi = 1;
+                    break;
+                }
+            }
+
+            if (!pesananDikonfirmasi) {
+                printf("Pesanan dengan ID %d tidak ditemukan atau tidak valid untuk dikonfirmasi.\n", konfirmasiID);
+            }
+
+            break;
+        }else if (pilKonfir == 2)
+        {
+            break;
+        }else {
+            printf("Eror 404. Input Tidak Valid!\n");
+        }
     }
 }
 
@@ -335,7 +518,7 @@ int cariKurir() {
         // Inisialisasi default
         id = role = 0;
 
-        printf("Baris sebelum parsing: %s\n", line);
+        // printf("Baris sebelum parsing: %s\n", line);
 
         // Parsing hanya ID dan role
         int parsed = sscanf(line, "%d,%*[^,],%*[^,],%*[^,],%*[^,],%*[^,],%d,%*[^,]",
