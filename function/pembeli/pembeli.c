@@ -863,10 +863,23 @@ void tampilkanPesananUser(int idLogin) {
             char totalOngkirFor[100];
             formatRibuan(pesanan[i].ongkir, totalOngkirFor);
 
+            // ambil tanggal
+            char pesananTanggal[3], pesananBulan[3], pesananTahun[5];
+            int pTanggal, pBulan, pTahun;
+
+            strncpy(pesananTanggal, pesanan[i].tanggalPesanan, 2);
+            strncpy(pesananBulan, pesanan[i].tanggalPesanan + 2, 2);
+            strncpy(pesananTahun, pesanan[i].tanggalPesanan + 4, 4);
+            pesananTanggal[2] = pesananBulan[2] = pesananTahun[4] = '\0';
+            pTanggal = atoi(pesananTanggal);
+            pBulan = atoi(pesananBulan);
+            pTahun = atoi(pesananTahun);
+
             // Menampilkan data pesanan
             printf("Barang %d:\n", i + 1);
             printf("  ID Pesanan        : %d\n", pesanan[i].id_pesanan);
             printf("  Nomor Pesanan     : %s\n", pesanan[i].nomorPesanan);
+            printf("  Tanggal           : %02d-%02d-%04d\n", pTanggal, pBulan, pTahun);
             printf("  Nama Barang       : %s\n", temp_namaProduct);
             printf("  Jumlah            : %d\n", pesanan[i].jumlah);
             printf("  Harga Satuan      : Rp.%s\n", hargaSatuanFor);

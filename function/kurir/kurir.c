@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "kurir.h"
 #include "../penjual/penjual.h"
 #include "../masuk/masuk.h"
 #include "../topup/topup.h"
+#include "../pembeli/pembeli.h"
 
 void halamanKurir(int *loggedIn, int idLogin) {
     char username[50], password[50], phone[16], alamat[50];
@@ -16,12 +18,12 @@ void halamanKurir(int *loggedIn, int idLogin) {
     int conlog = *loggedIn;
 
     printf("===========================\n");
-    printf("=== Selamat Datang %s ===\n", username); // Gunakan username untuk kurir
+    printf("==== Selamat Datang %s ====\n", username); // Gunakan username untuk kurir
     printf("===========================\n");
 
     int choice;
     do {
-        printf("==== Halaman Kurir ====\n");
+        printf("====== Halaman Kurir ======\n");
         printf("===========================\n");
         printf("1. Lihat Pesanan\n");
         printf("2. Konfirmasi Pengiriman\n");
@@ -76,13 +78,37 @@ void lihatPesananKurir(Pesanan pesanan[], int idKurir) {
     int count = bacaFilePesanan(pesanan);
     int found = 0;
 
-    printf("\n--- Daftar Pesanan untuk Kurir ID: %d ---\n", idKurir);
+    printf("=========================================\n");
+    printf("--- Daftar Pesanan untuk Kurir ID: %d ---\n", idKurir);
+    printf("=========================================\n");
+
     for (int i = 0; i < count; i++) {
         if (pesanan[i].id_kurir == idKurir) {
-            printf("ID Pesanan: %d, Nomor: %s, Alamat: %s, Status Pengiriman: %s\n",
-                   pesanan[i].id_pesanan, pesanan[i].nomorPesanan, pesanan[i].alamat,
-                   pesanan[i].status_pengiriman);
-            found = 1;
+            if (strcmp(pesanan[i].status_pengiriman,"Pesanan Selesai") != 0)
+            {
+                char pesananTanggal[3], pesananBulan[3], pesananTahun[5];
+                int pTanggal, pBulan, pTahun;
+                char totalOngkirFor[100];
+
+                strncpy(pesananTanggal, pesanan[i].tanggalPesanan, 2);
+                strncpy(pesananBulan, pesanan[i].tanggalPesanan + 2, 2);
+                strncpy(pesananTahun, pesanan[i].tanggalPesanan + 4, 4);
+                pesananTanggal[2] = pesananBulan[2] = pesananTahun[4] = '\0';
+                pTanggal = atoi(pesananTanggal);
+                pBulan = atoi(pesananBulan);
+                pTahun = atoi(pesananTahun);
+                formatRibuan(pesanan[i].ongkir, totalOngkirFor);
+
+                // Menampilkan data pesanan
+                printf("Barang %d:\n", i + 1);
+                printf("  ID Pesanan        : %d\n", pesanan[i].id_pesanan);
+                printf("  Nomor Pesanan     : %s\n", pesanan[i].nomorPesanan);
+                printf("  Tanggal           : %02d-%02d-%04d\n", pTanggal, pBulan, pTahun);
+                printf("  Ongkir            : Rp.%s\n", totalOngkirFor);
+                printf("  Status Pengiriman : %s\n", pesanan[i].status_pengiriman);
+                printf("----------------------------\n");
+                found = 1;
+            }
         }
     }
 

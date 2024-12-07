@@ -148,7 +148,7 @@ void Login(int *loggedIn, int *idLogin) {
     int total_akun = BacaFileAkun(akun);
 
     printf("=======================\n");
-    printf("MASUK\n");
+    printf("======== MASUK ========\n");
     printf("=======================\n");
 
         printf("Masukan Username: ");
@@ -164,9 +164,9 @@ void Login(int *loggedIn, int *idLogin) {
             }
         }
 
-        printf("=======================\n");
+        printf("=============================\n");
         printf("Username atau Password salah!\n");   
-        printf("=======================\n");
+        printf("=============================\n");
     
 }
 
@@ -177,7 +177,7 @@ void Daftar() {
     for (;;)
     {
         printf("=======================\n");
-        printf("=== Daftar ===\n");
+        printf("======== Daftar =======\n");
         printf("=======================\n");
         printf("1. Buat Akun User\n");
         printf("2. Buat Akun Penjual\n");
@@ -209,9 +209,9 @@ void Masuk(int *loggedIn, int *idLogin) {
 
     for (;;)
     {
-        printf("===========================\n");
+        printf("====================================\n");
         printf("=== Selamat Datang Di E-Commerce ===\n");
-        printf("===========================\n");
+        printf("====================================\n");
 
         printf("Apakah Sudah Memiliki Akun?\n");
         printf("1. Masuk\n");

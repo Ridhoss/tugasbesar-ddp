@@ -34,6 +34,7 @@ void viewProduct(Product *products, int count, int idLogin);
 
 // Menampilkan pesanan
 void listPesanan(Pesanan pesanan[], int idLogin);
+void tampilkanPesanan(Pesanan pesanan[], int count, int idLogin, char *status, char *judul);
 
 int bacaProductDariFile(Product product[]);
 
