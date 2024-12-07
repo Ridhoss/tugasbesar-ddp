@@ -481,9 +481,14 @@ void checkout(int idLogin) {
         return;
     }
 
+    int ongkir = (totalHarga * 10) / 100;
+    int totalHargaWithOngkir = totalHarga + ongkir;
+
     // Format harga menjadi ribuan
     char totalHargaFor[100];
-    formatRibuan(totalHarga, totalHargaFor);
+    formatRibuan(totalHargaWithOngkir, totalHargaFor);
+
+    printf("%d\n", ongkir);
 
     printf("============================\n");
     printf("Total Pembayaran: Rp. %s\n", totalHargaFor);
@@ -503,7 +508,7 @@ void checkout(int idLogin) {
         if (konfpem == 'y' || konfpem == 'Y') {
             if (totalHarga <= saldo) {
                 // Lakukan proses checkout
-                tulisPesanan(idLogin, checkoutItems, checkoutCount);
+                tulisPesanan(idLogin, checkoutItems, checkoutCount, ongkir);
 
                 // Update keranjang di file
                 FILE *file = fopen(keranjang_file, "w");
@@ -542,7 +547,7 @@ void checkout(int idLogin) {
 
 //! tulis pesanan punya faiz
 
-void tulisPesanan(int idLogin, Keranjang *barangCheckout, int barangCount) {
+void tulisPesanan(int idLogin, Keranjang *barangCheckout, int barangCount, int ongkir) {
     char username[50], password[50], phone[16], alamat[50], store_name[50];
     int rekening, role;
     CariAkun(idLogin, username, password, phone, alamat, &rekening, &role, store_name);
@@ -636,7 +641,8 @@ void tulisPesanan(int idLogin, Keranjang *barangCheckout, int barangCount) {
         pesanan[pesananCount].id_barang = barangCheckout[i].id_barang;
         pesanan[pesananCount].jumlah = barangCheckout[i].jumlah;
         pesanan[pesananCount].harga = barangCheckout[i].harga;
-        pesanan[pesananCount].total = barangCheckout[i].harga * barangCheckout[i].jumlah;
+        pesanan[pesananCount].ongkir = ongkir;
+        pesanan[pesananCount].total = (barangCheckout[i].harga * barangCheckout[i].jumlah) + ongkir;
         strcpy(pesanan[pesananCount].alamat, alamat);
         strcpy(pesanan[pesananCount].expedisi, "GoRisaiz");
         strcpy(pesanan[pesananCount].status_pembayaran, "Belum Dikonfirmasi");
@@ -650,7 +656,7 @@ void tulisPesanan(int idLogin, Keranjang *barangCheckout, int barangCount) {
 
     // Tulis data pesanan dari struct ke file
     for (int i = 0; i < pesananCount; i++) {
-        fprintf(file, "%d,%s,%d,%d,%d,%s,%d,%d,%d,%d,%s,%s,%s,%s\n",
+        fprintf(file, "%d,%s,%d,%d,%d,%s,%d,%d,%d,%d,%d,%s,%s,%s,%s\n",
                 pesanan[i].id_pesanan,
                 pesanan[i].nomorPesanan,
                 pesanan[i].id_pembeli,
@@ -660,6 +666,7 @@ void tulisPesanan(int idLogin, Keranjang *barangCheckout, int barangCount) {
                 pesanan[i].id_barang,
                 pesanan[i].jumlah,
                 pesanan[i].harga,
+                pesanan[i].ongkir,
                 pesanan[i].total,
                 pesanan[i].alamat,
                 pesanan[i].expedisi,
@@ -852,6 +859,10 @@ void tampilkanPesananUser(int idLogin) {
             char totalHargaFor[100];
             formatRibuan(pesanan[i].total, totalHargaFor);
 
+            // Format harga menjadi ribuan
+            char totalOngkirFor[100];
+            formatRibuan(pesanan[i].ongkir, totalOngkirFor);
+
             // Menampilkan data pesanan
             printf("Barang %d:\n", i + 1);
             printf("  ID Pesanan        : %d\n", pesanan[i].id_pesanan);
@@ -859,6 +870,7 @@ void tampilkanPesananUser(int idLogin) {
             printf("  Nama Barang       : %s\n", temp_namaProduct);
             printf("  Jumlah            : %d\n", pesanan[i].jumlah);
             printf("  Harga Satuan      : Rp.%s\n", hargaSatuanFor);
+            printf("  Ongkir            : Rp.%s\n", totalOngkirFor);
             printf("  Total Harga       : Rp.%s\n", totalHargaFor);
             printf("  Nama Toko         : %s\n", temp_namaToko);
             printf("  Expedisi          : %s\n", pesanan[i].expedisi);
@@ -893,6 +905,7 @@ void tampilkanPesananUser(int idLogin) {
 
                     // Menyimpan perubahan ke file
                     simpanFilePesanan(pesanan, pesananCount);
+                    transferAfterConfirm(idLogin, idpes);
                     pesananDikonfirmasi = 1;
                     break;
                 }
@@ -920,18 +933,58 @@ void tampilkanPesananUser(int idLogin) {
 }
 
 void transferAfterConfirm(int idLogin, int idPes) {
-    // Pesanan pesanan[100];
-    // int pesananCount = bacaFilePesanan(pesanan);
+    Pesanan pesanan[100];
+    int pesananCount = bacaFilePesanan(pesanan);
 
-    // for (int i = 0; i < pesananCount; i++) {
-    //     if (pesanan[i].id_pembeli == idLogin)
-    //     {
-    //         if (pesanan[i].id_pesanan == idPes) {
+    for (int i = 0; i < pesananCount; i++) {
+        if (pesanan[i].id_pembeli == idLogin)
+        {
+            if (pesanan[i].id_pesanan == idPes) {
 
+                int hargaUtama = (pesanan[i].harga * pesanan[i].jumlah);
+                int ongkir = pesanan[i].ongkir;
+                int total = pesanan[i].total;
 
+                Akun akuns[100];
+                int totalAkun = BacaFileAkun(akuns);
 
-    //         }   
-    //     }
-    // }
+                for (int j = 0; j < totalAkun; j++) {
+                    if (akuns[j].id == pesanan[i].id_penjual)
+                    {
+                        akuns[j].rekening += hargaUtama;
+                    }
 
+                    if (akuns[j].id == pesanan[i].id_kurir)
+                    {
+                        akuns[j].rekening += ongkir;
+                    }
+
+                    if(akuns[j].id == pesanan[i].id_pembeli){
+                        akuns[j].rekening -= total;
+                    }
+                }
+
+                updateSaldoUser(akuns, totalAkun);
+
+            }   
+        }
+    }
+}
+
+void updateSaldoUser(Akun akun[], int count) {
+    FILE *file = fopen("database/users.txt", "w");
+    if (file == NULL) {
+        printf("Gagal membuka file pemesanan.txt untuk menulis.\n");
+        return;
+    }
+    
+    for (int i = 0; i < count; i++) {
+            fprintf(file, "%d,%s,%s,%s,%s,%d,%d,%s\n", 
+                    akun[i].id, akun[i].username, akun[i].password, 
+                    akun[i].phone, akun[i].alamat, akun[i].rekening, 
+                    akun[i].role, akun[i].store_name);
+    }
+
+    fclose(file);
+    printf("Data pesanan berhasil disimpan.\n");
 }

@@ -3,6 +3,7 @@
 #include "kurir.h"
 #include "../penjual/penjual.h"
 #include "../masuk/masuk.h"
+#include "../topup/topup.h"
 
 void halamanKurir(int *loggedIn, int idLogin) {
     char username[50], password[50], phone[16], alamat[50];
@@ -24,7 +25,7 @@ void halamanKurir(int *loggedIn, int idLogin) {
         printf("===========================\n");
         printf("1. Lihat Pesanan\n");
         printf("2. Konfirmasi Pengiriman\n");
-        printf("3. Simpan Perubahan\n");
+        printf("3. Cek Rekening\n");
         printf("4. Logout\n");
         printf("Masukan pilihan:(1-4) ");
         scanf("%d", &choice);
@@ -37,7 +38,7 @@ void halamanKurir(int *loggedIn, int idLogin) {
                 updateStatusPengiriman(pesanan, idLogin); // Tambahkan idLogin sebagai parameter
                 break;
             case 3:
-                simpanFilePesanan(pesanan, bacaFilePesanan(pesanan)); // Perbarui jumlah pesanan
+                CekRekening(idLogin);
                 break;
             case 4:
                 Logout(&conlog);
@@ -58,10 +59,10 @@ void simpanFilePesanan(Pesanan pesanan[], int count) {
     }
     
     for (int i = 0; i < count; i++) {
-        fprintf(file, "%d,%s,%d,%d,%d,%s,%d,%d,%d,%d,%s,%s,%s,%s\n",
+        fprintf(file, "%d,%s,%d,%d,%d,%s,%d,%d,%d,%d,%d,%s,%s,%s,%s\n",
                 pesanan[i].id_pesanan, pesanan[i].nomorPesanan, pesanan[i].id_pembeli,
                 pesanan[i].id_penjual, pesanan[i].id_kurir, pesanan[i].tanggalPesanan,
-                pesanan[i].id_barang, pesanan[i].jumlah, pesanan[i].harga,
+                pesanan[i].id_barang, pesanan[i].jumlah, pesanan[i].harga, pesanan[i].ongkir,
                 pesanan[i].total, pesanan[i].alamat, pesanan[i].expedisi,
                 pesanan[i].status_pembayaran, pesanan[i].status_pengiriman);
     }

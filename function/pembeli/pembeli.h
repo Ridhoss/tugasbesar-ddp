@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include "../penjual/penjual.h"
+#include "../masuk/masuk.h"
 
 typedef struct {
     int id;
@@ -35,7 +36,7 @@ void simpanKeranjangKeFile(Keranjang keranjang[], int keranjangCount);
 
 void checkout(int idLogin);
 
-void tulisPesanan(int idLogin, Keranjang *barangCheckout, int barangCount);
+void tulisPesanan(int idLogin, Keranjang *barangCheckout, int barangCount, int ongkir);
 
 void upStokProduct(int idBarang, int jumlah);
 
@@ -48,5 +49,7 @@ void statusPengiriman(int *pengiriman);
 void tampilkanPesananUser(int idLogin);
 
 void transferAfterConfirm(int idLogin, int idPes);
+
+void updateSaldoUser(Akun akun[], int count);
 
 #endif

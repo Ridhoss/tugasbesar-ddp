@@ -45,9 +45,15 @@ int HanyaTampilkanSaldo(int idLogin) {
     int pesananCount = bacaFilePesanan(pesanan);
     int totalHargaPesanan = 0;
 
-    for (int i = 0; i < pesananCount; i++) {
-        if (pesanan[i].id_pembeli == idLogin) {
-            totalHargaPesanan += pesanan[i].harga;
+    if (role == 1)
+    {
+        for (int i = 0; i < pesananCount; i++) {
+            if (pesanan[i].id_pembeli == idLogin) {
+                if (strcmp(pesanan[i].status_pengiriman,"Pesanan Selesai") != 0)
+                {
+                    totalHargaPesanan += pesanan[i].harga;
+                }
+            }
         }
     }
 

@@ -14,13 +14,12 @@ typedef struct {
     int id_barang;
     int jumlah;
     int harga;
+    int ongkir;
     int total;
     char expedisi[20];
     char alamat[50];
     char status_pembayaran[20];
     char status_pengiriman[20];
-    char metode_pengiriman[20];
-    char status_pesanan[20];
 } Pesanan;
 
 #endif

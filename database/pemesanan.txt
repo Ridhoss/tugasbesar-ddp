@@ -1,3 +1,1 @@
-1,07122401,1,2,3,071224,1,1,100000,100000,bandung,GoRisaiz,Terkonfirmasi,Pesanan Selesai
-2,07122402,1,2,3,071224,1,1,100000,100000,bandung,GoRisaiz,Terkonfirmasi,Belum Dikirim
-3,07122403,1,2,0,071224,1,1,100000,100000,bandung,GoRisaiz,Belum Dikonfirmasi,Belum Dikirim
+1,07122401,1,2,3,071224,1,1,100000,10000,110000,bandung,GoRisaiz,Terkonfirmasi,Pesanan Selesai

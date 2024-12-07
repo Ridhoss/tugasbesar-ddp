@@ -1,3 +1,3 @@
-1,user,123,08954010,bandung,50000000,1,null
-2,admin,123,045945,cimahi,0,2,minstore
-3,kurir,123,2313182,null,0,3,null
+1,user,123,08954010,bandung,49890000,1,null
+2,admin,123,045945,cimahi,110000,2,minstore
+3,kurir,123,2313182,null,10000,3,null

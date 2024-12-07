@@ -282,7 +282,6 @@ void listPesanan(Pesanan pesanan[], int idLogin) {
     printf("======== Daftar Pesanan ========\n");
     printf("================================\n");
 
-    printf("================================\n");
     printf("====== Sudah Dikonfirmasi ======\n");
     printf("================================\n");
 
@@ -319,7 +318,11 @@ void listPesanan(Pesanan pesanan[], int idLogin) {
                 
                 // Format harga menjadi ribuan
                 char totalHargaFor[100];
-                formatRibuan(pesanan[i].total, totalHargaFor);
+                formatRibuan((pesanan[i].harga * pesanan[i].jumlah), totalHargaFor);
+
+                // Format harga menjadi ribuan
+                char totalOngkirFor[100];
+                formatRibuan(pesanan[i].ongkir, totalOngkirFor);
 
                     // Menampilkan data pesanan
                     printf("Pesanan %d:\n", i + 1);
@@ -329,6 +332,7 @@ void listPesanan(Pesanan pesanan[], int idLogin) {
                     printf("  Nama Barang       : %s\n", temp_namaProduct);
                     printf("  Jumlah            : %d\n", pesanan[i].jumlah);
                     printf("  Harga Satuan      : Rp.%s\n", hargaSatuanFor);
+                    printf("  Ongkir            : Rp.%s\n", totalOngkirFor);
                     printf("  Total Harga       : Rp.%s\n", totalHargaFor);
                     printf("  Expedisi          : %s\n", pesanan[i].expedisi);
                     printf("  Status Pembayaran : %s\n", pesanan[i].status_pembayaran);
@@ -338,6 +342,10 @@ void listPesanan(Pesanan pesanan[], int idLogin) {
                 pesCount ++;
             }
         }
+    }
+
+    if(pesCount == 0){
+        printf("-- Belum ada yang dikonfirmasi! --\n");
     }
 
     printf("================================\n");
@@ -377,7 +385,11 @@ void listPesanan(Pesanan pesanan[], int idLogin) {
                 
                 // Format harga menjadi ribuan
                 char totalHargaFor[100];
-                formatRibuan(pesanan[i].total, totalHargaFor);
+                formatRibuan((pesanan[i].harga * pesanan[i].jumlah), totalHargaFor);
+
+                // Format harga menjadi ribuan
+                char totalOngkirFor[100];
+                formatRibuan(pesanan[i].ongkir, totalOngkirFor);
 
                     // Menampilkan data pesanan
                     printf("Pesanan %d:\n", i + 1);
@@ -387,6 +399,7 @@ void listPesanan(Pesanan pesanan[], int idLogin) {
                     printf("  Nama Barang       : %s\n", temp_namaProduct);
                     printf("  Jumlah            : %d\n", pesanan[i].jumlah);
                     printf("  Harga Satuan      : Rp.%s\n", hargaSatuanFor);
+                    printf("  Ongkir            : Rp.%s\n", totalOngkirFor);
                     printf("  Total Harga       : Rp.%s\n", totalHargaFor);
                     printf("  Expedisi          : %s\n", pesanan[i].expedisi);
                     printf("  Status Pembayaran : %s\n", pesanan[i].status_pembayaran);
@@ -484,15 +497,15 @@ int bacaFilePesanan(Pesanan pesanan[]) {
         Pesanan tempPesanan;
 
         // Membaca satu baris data dari file
-        int itemsRead = fscanf(file, "%d,%49[^,],%d,%d,%d,%49[^,],%d,%d,%d,%d,%49[^,],%49[^,],%49[^,],%49[^\n]\n",
+        int itemsRead = fscanf(file, "%d,%49[^,],%d,%d,%d,%49[^,],%d,%d,%d,%d,%d,%49[^,],%49[^,],%49[^,],%49[^\n]\n",
                                &tempPesanan.id_pesanan, tempPesanan.nomorPesanan, &tempPesanan.id_pembeli,
                                &tempPesanan.id_penjual, &tempPesanan.id_kurir, tempPesanan.tanggalPesanan,
-                               &tempPesanan.id_barang, &tempPesanan.jumlah, &tempPesanan.harga,
+                               &tempPesanan.id_barang, &tempPesanan.jumlah, &tempPesanan.harga, &tempPesanan.ongkir,
                                &tempPesanan.total, tempPesanan.alamat, tempPesanan.expedisi,
                                tempPesanan.status_pembayaran, tempPesanan.status_pengiriman);
 
         // Pastikan semua kolom berhasil terbaca
-        if (itemsRead == 14) {
+        if (itemsRead == 15) {
             pesanan[count] = tempPesanan; // Menyimpan data ke array
             count++;
         } else if (itemsRead > 0) {
