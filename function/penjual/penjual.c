@@ -27,10 +27,11 @@ void halamanAdmin(int *loggedIn, int idLogin){
     printf("=== Selamat Datang %s ===\n", store_name);
     printf("===========================\n");
 
-        const int MAX_PRODUCTS = 100;
-        Product products[MAX_PRODUCTS];
-        int count = 0;
-        count = loadProducts(products, MAX_PRODUCTS);
+    const int MAX_PRODUCTS = 100;
+    Product products[MAX_PRODUCTS];
+
+    int count = 0;
+    count = loadProducts(products, MAX_PRODUCTS);
     
     int choice;
     do {
@@ -43,7 +44,7 @@ void halamanAdmin(int *loggedIn, int idLogin){
         printf("4. Cek Rekening\n");
         printf("5. Lihat Rekap Penjualanan\n");
         printf("6. Logout\n");
-        printf("Masukan pilihan:(1-5) ");
+        printf("Masukan pilihan:(1-6) ");
         scanf("%d", &choice);
         switch (choice) {
             case 1:

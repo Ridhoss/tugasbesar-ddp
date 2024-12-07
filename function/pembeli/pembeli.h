@@ -44,8 +44,6 @@ void hapusDariKeranjang(int idLogin);
 
 void simpanPesanan(Keranjang keranjang[], int keranjangCount);
 
-void statusPengiriman(int *pengiriman);
-
 void tampilkanPesananUser(int idLogin);
 
 void transferAfterConfirm(int idLogin, int idPes);

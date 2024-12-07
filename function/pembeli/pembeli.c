@@ -791,17 +791,6 @@ void hapusDariKeranjang(int idLogin) {
     }
 }
 
-void statusPengiriman(int *pengiriman) {
-    printf("\n============================\n");
-    printf("  STATUS PENGIRIMAN\n");
-    printf("============================\n");
-    if (*pengiriman) {
-        printf("Pesanan Anda sedang dalam perjalanan!\n");
-    } else {
-        printf("Pesanan Anda belum dikirimkan.\n");
-    }
-}
-
 void simpanPesanan(Keranjang keranjang[], int keranjangCount) {
     FILE *file = fopen(file_pemesanan, "a"); // Buka file dalam mode append
     if (file == NULL) {
