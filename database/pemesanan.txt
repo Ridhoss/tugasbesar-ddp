@@ -1,1 +1,5 @@
-1,07122401,1,2,3,071224,1,1,100000,10000,110000,bandung,GoRisaiz,Terkonfirmasi,Pesanan Selesai
+1,07122401,1,2,3,06122024,1,1,100000,10000,110000,bandung,GoRisaiz,Terkonfirmasi,Pesanan Selesai
+2,07122402,1,2,3,07112024,1,1,100000,10000,110000,bandung,GoRisaiz,Terkonfirmasi,Pesanan Selesai
+3,07122403,1,2,3,07122024,1,1,100000,10000,110000,bandung,GoRisaiz,Terkonfirmasi,Pesanan Selesai
+4,07122404,1,2,3,07122025,1,1,100000,10000,110000,bandung,GoRisaiz,Terkonfirmasi,Pesanan Selesai
+5,07122405,1,2,3,07122024,1,1,100000,10000,110000,bandung,GoRisaiz,Terkonfirmasi,Pesanan Selesai

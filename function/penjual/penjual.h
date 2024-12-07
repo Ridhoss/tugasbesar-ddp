@@ -43,4 +43,8 @@ int cariKurir();
 
 int loadProducts(Product *products, int max_count);
 
+void LihatRekap(int idLogin);
+
+void AmbilRekap(int tanggal, int bulan, int tahun, int idLogin);
+
 #endif

@@ -41,7 +41,8 @@ void halamanAdmin(int *loggedIn, int idLogin){
         printf("2. Pengelolaan Produk\n");
         printf("3. Cek Pesanan\n");
         printf("4. Cek Rekening\n");
-        printf("5. Logout\n");
+        printf("5. Lihat Rekap Penjualanan\n");
+        printf("6. Logout\n");
         printf("Masukan pilihan:(1-5) ");
         scanf("%d", &choice);
         switch (choice) {
@@ -58,13 +59,16 @@ void halamanAdmin(int *loggedIn, int idLogin){
                 CekRekening(idLogin);
                 break;
             case 5:
+                LihatRekap(idLogin);
+                break;
+            case 6:
                 Logout(&conlog);
                 *loggedIn = conlog;
                 break;
             default:
                 printf("Pilihan tidak ada\n");
         }
-    } while (choice != 5);
+    } while (choice != 6);
 }
 
 void pengelolaanProduct(int idLogin) {
@@ -555,4 +559,120 @@ int loadProducts(Product *products, int max_count) {
     fclose(file);
     printf("Memuat %d produk dari file.\n", count);
     return count;
+}
+
+void LihatRekap(int idLogin) {
+    printf("======================================\n");
+    printf("====== Rekapitulasi Penjualanan ======\n");
+    printf("======================================\n");
+
+    int tanggal = 0;
+    int bulan = 0;
+    int tahun = 0;
+
+    for (;;) {
+        printf("1. Rekap Harian\n");
+        printf("2. Rekap Bulanan\n");
+        printf("3. Rekap Tahunan\n");
+        int pilModeRekap;
+        printf("Pilih:(1-3) ");
+        scanf("%d", &pilModeRekap);
+
+        if(pilModeRekap == 1){
+            printf("Masukan Tanggal:(1-31) ");
+            scanf("%d", &tanggal);
+
+            printf("Masukan Bulan:(1-12) ");
+            scanf("%d", &bulan);
+
+            printf("Masukan Tahun: ");
+            scanf("%d", &tahun);
+
+            AmbilRekap(tanggal, bulan, tahun, idLogin);
+            break;
+        }else if (pilModeRekap == 2)
+        {
+            printf("Masukan Bulan:(1-12) ");
+            scanf("%d", &bulan);
+
+            printf("Masukan Tahun: ");
+            scanf("%d", &tahun);
+
+            AmbilRekap(0, bulan, tahun, idLogin);
+            break;
+        }else if (pilModeRekap == 3)
+        {
+            printf("Masukan Tahun: ");
+            scanf("%d", &tahun);
+
+            AmbilRekap(0, 0, tahun, idLogin);
+            break;
+        }else {
+            printf("Error 404. Input Tidak Valid!\n");
+        }
+    }
+
+}
+
+void AmbilRekap(int tanggal, int bulan, int tahun, int idLogin) {
+    Pesanan pesanan[100];
+    int pesananCount = bacaFilePesanan(pesanan);
+    
+    printf("===================================\n");
+    printf("Rekap Pesanan:\n");
+    printf("===================================\n");
+
+    int adaPesanan = 0;
+
+    for (int i = 0; i < pesananCount; i++) {
+        if (pesanan[i].id_penjual == idLogin) {
+
+            // Ambil tanggal, bulan, dan tahun dari pesanan
+            char pesananTanggal[3], pesananBulan[3], pesananTahun[5];
+            strncpy(pesananTanggal, pesanan[i].tanggalPesanan, 2);
+            strncpy(pesananBulan, pesanan[i].tanggalPesanan + 2, 2);
+            strncpy(pesananTahun, pesanan[i].tanggalPesanan + 4, 4);
+
+            pesananTanggal[2] = '\0';
+            pesananBulan[2] = '\0';
+            pesananTahun[4] = '\0';
+
+            int pTanggal = atoi(pesananTanggal);
+            int pBulan = atoi(pesananBulan);
+            int pTahun = atoi(pesananTahun);
+
+            // Format harga menjadi ribuan
+            char totalHargaFor[100];
+            formatRibuan((pesanan[i].harga * pesanan[i].jumlah), totalHargaFor);
+
+            Product products[100];
+            int totalProduct = bacaProductDariFile(products);
+            char temp_namaProduct[50];
+
+            for (int g = 0; g < totalProduct ; g++) {
+                if (products[g].id == pesanan[i].id_barang)
+                {
+                    strcpy(temp_namaProduct, products[g].name);
+                }
+            }
+
+
+            // Filter berdasarkan cakupan
+            if ((tanggal == 0 || pTanggal == tanggal) && (bulan == 0 || pBulan == bulan) && (tahun == pTahun)) {
+                adaPesanan = 1;
+
+                printf("Nomor Pesanan     : %s\n", pesanan[i].nomorPesanan);
+                printf("Tanggal           : %02d-%02d-%04d\n", pTanggal, pBulan, pTahun);
+                printf("Nama Barang       : %s\n", temp_namaProduct);
+                printf("Jumlah            : %d\n", pesanan[i].jumlah);
+                printf("Total Harga       : %s\n", totalHargaFor);
+
+                printf("-----------------------------------\n");
+            }
+        }
+    }
+
+    if (!adaPesanan) {
+        printf("Tidak ada pesanan ditemukan untuk cakupan tersebut.\n");
+    }
 }

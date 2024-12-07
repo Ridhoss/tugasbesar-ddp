@@ -579,7 +579,7 @@ void tulisPesanan(int idLogin, Keranjang *barangCheckout, int barangCount, int o
     time_t t = time(NULL);
     struct tm *waktu = localtime(&t);
 
-    snprintf(tanggalPesanan, sizeof(tanggalPesanan), "%02d%02d%02d",
+    snprintf(tanggalPesanan, sizeof(tanggalPesanan), "%02d%02d%04d",
              waktu->tm_mday, waktu->tm_mon + 1, (waktu->tm_year + 1900) % 100);
 
     // Cek increment terakhir untuk nomor pesanan
